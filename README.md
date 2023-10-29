@@ -1,9 +1,9 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 _TODO zenodo badge here
 
-## Air pollution damages of overshooting temperature
+## Beyond the Limit: The air pollution damages of overshooting temperature
 
-**Air pollution damages of overshooting temperature**
+**Beyond the Limit: The air pollution damages of overshooting temperature**
 
 Clàudia Rodés-Bachs<sup>1,2\*</sup>, Lara Aleluia Reis<sup>2</sup>, Laurent Drouet<sup>2</sup>, Massimo Tavoni<sup>2,3</sup>, Peter Rafaj<sup>4</sup>, 
 
@@ -18,7 +18,12 @@ Clàudia Rodés-Bachs<sup>1,2\*</sup>, Lara Aleluia Reis<sup>2</sup>, Laurent Dr
 \* corresponding author:  claudia.rodes@bc3research.org
 
 ## Abstract
-Outdoor air pollution is responsible for a substantial amount of premature deaths and severe illnesses, together with economic damages. Just in 2019, according to the Global Burden Disease, it caused 4.505 million [3.625-5.364 95\% CI] deaths. Air pollution co-benefits derive directly from the climate change mitigation policies. The new AR6 IPCC report has recently included a new carbon budget design - the net-zero pathway - to avoid temperature overshoot. However, a lot of factors add uncertainty to the estimation of health impacts and economic damages. We set out to answer if the net-zero pathways can provide consistently better air pollution outcomes, as well as to study the main drivers of uncertainty in air pollution mortality and damages, as well as their interaction, with a special focus on the role of non-overshooting scenarios. To this end, the climate mitigation scenarios from the ENGAGE database are imputed in a global source-receptor air pollution model (FASST) to estimate concentrations. We implement several RR functions to compute premature deaths and a set of air pollution damage functions. We conclude that stringent climate policies, keeping well below 2ºC, together with net-zero pathways consistently improve the health and economic co-benefits and reduce the risk of extreme mortality outcomes. Improvements are particularly important for China and India. These results are robust across several air pollution damage estimation methods and normative choices. Globally, net-zero policies avoid 211 thousand [133-274 95\% CI] premature deaths and 748 billion [724-766 95\% CI] USD of damages relative to end-of-century in 2030.
+Outdoor air pollution is responsible for a substantial amount of premature deaths, severe illnesses, and economic damages. In 2019, according to the Global Burden Disease, it caused 4.505 million [3.625-5.364 95\% CI] deaths. However, we can expect air pollution co-benefits from climate change mitigation policies in the next decades. Some scenarios revised by the recent IPCC AR6 report follow a new carbon budget design --- the net-zero pathways --- which avoids temperature overshoot. We examine if the net-zero pathways can consistently deliver improved air pollution outcomes. Here, we use a global source-receptor air pollution model to estimate concentrations and the health impacts and economic damages of climate mitigation scenarios.
+Moreover, we sought to investigate the primary factors contributing to uncertainty in air pollution mortality and damages, as well as how they interact, with particular emphasis on the significance of non-overshooting scenarios.
+We implement several relative risk functions to compute premature deaths and a set of air pollution damage functions. We conclude that stringent climate policies, keeping well below 2ºC, and net-zero pathways consistently improve the health and economic co-benefits and reduce the risk of extreme mortality outcomes. 
+Improvements are particularly important for China and India. These results are robust across several air pollution damage estimation methods and normative choices. 
+Globally, net-zero policies avoid 211 thousand [133-274 95\% CI] premature deaths and 748 billion [724-766 95\% CI] USD/2010 of damages relative to end-of-century in 2030.
+
 
 ## Code reference
 Available at Zenodo: _TODO zenodo badge here
