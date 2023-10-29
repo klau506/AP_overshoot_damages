@@ -39,16 +39,16 @@ do_iams_plot = function(datIni, poll, save) {
     theme_light() +
     theme(panel.background = element_rect(fill = NA), panel.grid.major = element_line(colour = "grey90"),
           panel.ontop = FALSE, legend.position = "bottom", strip.text = element_text(color = "black"),
-          strip.text.y = element_text(size = 13, angle = 0, hjust = 0),
-          plot.background = element_rect(fill = 'white'), 
-          axis.text.x = element_text(size = 10, angle = 45, vjust = 1, hjust = 1),axis.text.y = element_text(size = 10),
+          strip.text.y = element_text(size = 13, angle = 0, hjust = 0), panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
+          axis.text.x = element_text(size = 10),axis.text.y = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
     scale_x_continuous(labels = function(value) format(value, scientific = TRUE)) +
     scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy') +
     scale_color_manual(values = scenario.colors,
                        name = 'Climate\npolicy') +
-    labs(title='', x = 'Number of deaths', y = "Probability density")
+    labs(title='', x = 'Premature deaths', y = "Probability density\n\n\n")
   
   if(save) {
     h = as.integer(length(unique(dat_to_plot$impact_function_group)))*37.5
@@ -73,16 +73,16 @@ do_impfun_plot = function(datIni, poll, save) {
     theme_light() +
     theme(panel.background = element_rect(fill = NA), panel.grid.major = element_line(colour = "grey90"),
           panel.ontop = FALSE, legend.position = "bottom", strip.text = element_text(color = "black"),
-          strip.text.y = element_text(size = 13, angle = 0, hjust = 0),
-          plot.background = element_rect(fill = 'white'), 
-          axis.text.x = element_text(size = 10, angle = 45, vjust = 1, hjust = 1),axis.text.y = element_text(size = 10),
+          strip.text.y = element_text(size = 13, angle = 0, hjust = 0), panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
+          axis.text.x = element_text(size = 10),axis.text.y = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
     scale_x_continuous(labels = function(value) format(value, scientific = TRUE))+
     scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy')+
     scale_color_manual(values = scenario.colors,
                        name = 'Climate\npolicy')+
-    labs(title='', x = 'Number of deaths', y = "Probability density")
+    labs(title='', x = 'Premature deaths', y = "Probability density\n")
   
   if(save) {
     h = as.integer(length(unique(dat_to_plot$impact_function_group)))*37.5
@@ -98,16 +98,22 @@ do_impfun_plot = function(datIni, poll, save) {
 
 
 # do figure by region
-doM_iams_rrfun = function(datIni) {
+doM_iams_rrfun = function(datIni, legend = TRUE) {
   for (poll in unique(datIni$pollutant)) {
-    dat_to_plot <- do_iams_vs_impfun_pre(datIni, poll)
+    dat_to_plot = do_iams_vs_impfun_pre(datIni, poll)
+    str(dat_to_plot)
     
     for (cb in unique(dat_to_plot$cb_group)) {
       pl_impfun <<- do_impfun_plot(dat_to_plot %>% filter(cb_group == cb), poll, save = TRUE)
       pl_iams <<- do_iams_plot(dat_to_plot %>% filter(cb_group == cb), poll, save = TRUE)
       
-      pl_joint = ggpubr::ggarrange(pl_iams + labs(title = 'a1'), pl_impfun + labs(title = 'a2'),
-                               ncol=2, common.legend = T,legend = "bottom")
+      if (legend) {
+        pl_joint = ggpubr::ggarrange(pl_iams + labs(title = 'a1'), pl_impfun + labs(title = 'a2'),
+                                     ncol=2, common.legend = T,legend = "bottom")
+      } else {
+        pl_joint = ggpubr::ggarrange(pl_iams + labs(title = 'a1'), pl_impfun + labs(title = 'a2'),
+                                     ncol=2, common.legend = T,legend = "none")
+      }
       
       pl = cowplot::ggdraw() +
         theme(plot.background = element_rect(fill="white")) +

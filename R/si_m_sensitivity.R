@@ -318,10 +318,10 @@ doM_zcf_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
                                                 "median",
                                                 "95th"))]
   dat[z_level == "zLO", z_label := '5th']
-  dat[z_level == "zMED", z_label := 'mean']
+  dat[z_level == "zMED", z_label := 'median']
   dat[z_level == "zHI", z_label := '95th']
   dat[z_level == "zUNI", z_label := 'No ZCF\nuncertainty']
-  dat[, z_level := factor(z_label, levels = c('5th','mean','95th','No ZCF\nuncertainty'))]
+  dat[, z_level := factor(z_label, levels = c('5th','median','95th','No ZCF\nuncertainty'))]
   
   dat = do_rename_imp_fun_etal(dat)
   if (poll == 'PM25') {

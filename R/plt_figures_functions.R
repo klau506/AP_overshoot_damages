@@ -248,9 +248,9 @@ map_plot = function(df, save, what, y, facet_title){
   # merge the WITCH regional definition with the world map
   world <- merge(world,wreg, by.x = "adm0_a3", by.y = "ISO")
   
-  if (what != 'av_mort_diff') {
+  if (!what %in% c('av_mort_diff','av_mort_diff_main','av_damage_diff_main')) {
     levels(df$alpha) <- c("high","medium",'low')
-  }
+  } 
   
   #merge world data with our df
   world0 <- merge(df[df$year %in% y,], world, by = "n", allow.cartesian=TRUE)
@@ -261,6 +261,10 @@ map_plot = function(df, save, what, y, facet_title){
   
   legend = ifelse(grepl('av_mort_diff', what, fixed = TRUE), 'Avoided deaths\n',
                   'US Billion\n')
+  
+  if (grepl('main', what)) {
+    world1$quantile <- factor(world1$quantile, levels = c('v05','vmed','v95'))
+  }
   
   #plot
   pl <- ggplot(data = world1, xaxt = "n") +
@@ -313,9 +317,19 @@ map_plot = function(df, save, what, y, facet_title){
   } else if (what == c('av_mort_diff')) {
     pl = pl +
       scale_fill_material("teal",guide = guide_colourbar(direction = "vertical", title = element_blank()),
-                          name = legend,trans='pseudo_log',breaks = c(0,floor(median(world1$value)),floor(max(world1$value))))+ 
+                          name = legend,trans='pseudo_log',breaks = c(floor(min(world1$value)),floor(median(world1$value)),floor(max(world1$value))))+ 
       facet_wrap(impact_function ~ ., ncol = 5,
                  labeller = labeller(impact_function = impact_function_group.labs, ci_z_level = ci_z_level.labs)) +
+      theme(legend.key.size = unit(1.5, 'cm'), legend.key.height = unit(3,'cm'),
+            strip.text.y = element_text(size = 12,angle = 90),strip.text.x = element_text(size = 12),
+            legend.title = element_text(size=12), legend.text = element_text(size=12), legend.position = 'bottom') + 
+      guides(fill = guide_colourbar(barheight = 0.8, barwidth = 9))
+  } else if (grepl('main', what)) {
+    pl = pl +
+      scale_fill_material("teal",guide = guide_colourbar(direction = "vertical", title = element_blank()),
+                          name = legend,trans='pseudo_log',breaks = c(floor(min(world1$value)),floor(median(world1$value)),floor(max(world1$value))))+
+      facet_wrap(quantile ~ ., ncol = 3,
+                 labeller = labeller(quantile = quantile.labs)) +
       theme(legend.key.size = unit(1.5, 'cm'), legend.key.height = unit(3,'cm'),
             strip.text.y = element_text(size = 12,angle = 90),strip.text.x = element_text(size = 12),
             legend.title = element_text(size=12), legend.text = element_text(size=12), legend.position = 'bottom') + 
@@ -353,7 +367,7 @@ prob_distrib_mort = function(df, y, remove_xfacet, reg, legend = TRUE) {
     geom_density(data = df, aes(x = value, group = interaction(scenario,ci_z_level),
                                 color = scenario, fill = scenario, linetype = ci_z_level), 
                  linewidth = 0.8, alpha = 0.25) +
-    facet_wrap(. ~ impact_function_group, nrow = 2,
+    facet_wrap(. ~ impact_function_group, nrow = 2, scales = 'free_y',
                labeller = labeller(impact_function_group = impact_function_group.labs)) +
     theme_pubr() +
     scale_fill_manual(values = scenario.colors,
@@ -362,6 +376,9 @@ prob_distrib_mort = function(df, y, remove_xfacet, reg, legend = TRUE) {
     scale_color_manual(values = scenario.colors,
                        name = 'Climate policy',
                        labels = scenario.labs)+
+    scale_linetype_manual(values = ci_z_level.linestyle,
+                          name = 'Parameters & \nCF quantiles',
+                          labels = ci_z_level.labs)+
     guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
                                                        keywidth = 3, override.aes = list(linewidth = 2)),
            color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
@@ -370,6 +387,58 @@ prob_distrib_mort = function(df, y, remove_xfacet, reg, legend = TRUE) {
     theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE, 
           strip.text = element_text(size = 12), strip.background = element_blank(),
           axis.title.x = element_text(size = 12), axis.title.y = element_blank(), axis.text.x = element_text(angle = 20, hjust = 1), axis.text = element_text(size = 12),
+          legend.key.size = unit(1.5, 'cm'), legend.title = element_text(size = 12), legend.text = element_text(size = 12), legend.position = "bottom")
+  
+  if (remove_xfacet) {
+    pl = pl + theme(strip.text.y = element_blank())
+  }
+  if (!legend) {
+    pl = pl + theme(legend.position = 'none') + labs(x = '')
+  }
+  
+  pl = pl + theme(legend.key.size = unit(1, 'cm'))
+  name = paste0('paper_figures/fig1/distrib_plot_mort_',reg,'_',y,'.png')
+  print(name)
+  ggsave(file=file.path(name), width = 1000, height = 400, units = 'mm', plot = pl)
+  
+  return(pl)
+}
+
+#' prob_distrib_mort_main
+#' 
+#' @param df dataset
+#' @param y year
+#' @param remove_xfacet if true, remove facet text x-axis
+#' @param reg region
+#' @param legend TRUE by default, if false it is removed
+#' @return Figure: probability distribution of premature mortality
+prob_distrib_mort_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
+
+  df = df |> dplyr::filter(n == reg & year == y)
+  df = data.table(df)
+
+  pl <- ggplot(df) +
+    geom_density(data = df, aes(x = value, group = interaction(scenario,ci_z_level),
+                                color = scenario, fill = scenario, linetype = ci_z_level), 
+                 linewidth = 0.8, alpha = 0.25) +
+    theme_pubr() +
+    scale_fill_manual(values = scenario.colors,
+                      name = 'Climate policy',
+                      labels = scenario.labs)+
+    scale_color_manual(values = scenario.colors,
+                       name = 'Climate policy',
+                       labels = scenario.labs)+
+    scale_linetype_manual(values = ci_z_level.linestyle,
+                          name = 'Parameters & \nCF quantiles',
+                          labels = ci_z_level.labs)+
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+                                                       keywidth = 3, override.aes = list(linewidth = 2)),
+           color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
+    labs(x = 'Premature deaths') +
+    scale_x_continuous(labels = function(x) ifelse(x == 0, "0", scales::scientific_format()(x))) +
+    theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE, 
+          strip.text = element_text(size = 12), strip.background = element_blank(),
+          axis.title.x = element_text(size = 12), axis.title.y = element_blank(), axis.text = element_text(size = 12),
           legend.key.size = unit(1.5, 'cm'), legend.title = element_text(size = 12), legend.text = element_text(size = 12), legend.position = "bottom")
   
   if (remove_xfacet) {
@@ -440,6 +509,54 @@ cum_fun_mort = function(df, y, remove_xfacet, reg) {
 }
 
 
+#' cum_fun_mort_main
+#' 
+#' @param df dataset
+#' @param y year
+#' @param remove_xfacet if true, remove facet text x-axis
+#' @param reg region
+#' @return Figure: cumulative function of premature mortality
+cum_fun_mort_main = function(df, y, remove_xfacet, reg) {
+  df = df |> filter(n == reg & year == y) #& quantile_name %in% c('v05','vmed','v95'))
+  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,ci_z_level), summarize,
+                         value = unique(value),
+                         ecdf = ecdf(value)(unique(value)))
+  
+  pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = ci_z_level)) +
+    geom_line(linewidth = 0.8) +
+    theme_pubr() +
+    scale_color_manual(values = scenario.colors,
+                       name = 'Climate policy',
+                       labels = scenario.labs)+
+    scale_fill_manual(values = scenario.colors,
+                      name = 'Climate policy',
+                      labels = scenario.labs)+
+    scale_linetype_manual(values = ci_z_level.linestyle,
+                          name = 'Parameters & \nCF quantiles',
+                          labels = ci_z_level.labs)+
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+                                                       keywidth = 3, override.aes = list(linewidth = 2)),
+           color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
+    labs(x = 'Premature deaths') +
+    scale_x_continuous(labels = function(x) ifelse(x == 0, "0", scales::scientific_format()(x))) +
+    theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
+          strip.text = element_text(size = 12), strip.background = element_blank(),
+          axis.title.x = element_text(size = 12), axis.title.y = element_blank(), axis.text = element_text(size = 12),
+          legend.key.size = unit(1.5, 'cm'), legend.title = element_text(size = 12), legend.text = element_text(size = 12), legend.position = "bottom")
+  
+  if (remove_xfacet) {
+    pl = pl + theme(strip.text.y = element_blank())
+  }
+  
+  pl = pl + theme(legend.key.size = unit(1, 'cm'))
+  name = paste0('paper_figures/fig1/cumulative_plot_mort_',reg,'_',y,'.png')
+  print(name)
+  ggsave(file=file.path(name), width = 1000, height = 400, units = 'mm', plot = pl, limitsize = FALSE)
+  
+  return(pl)
+}
+
+
 
 
 #' prob_distrib_econ
@@ -460,8 +577,57 @@ prob_distrib_econ = function(df, y, remove_xfacet, reg, legend = TRUE) {
     geom_density(data = df, aes(x = value, group = interaction(scenario, alpha),
                                 color = scenario, fill = scenario, linetype = alpha), linewidth = 0.8, alpha = 0.25) +
     # geom_vline(aes(color = scenario, xintercept = medi), data = datall_medi, linewidth = 2) +
-    ggh4x::facet_grid2(. ~ method, 
+    facet_wrap(. ~ method, scales = 'free_y', nrow = 1,
                        labeller = labeller(method = method_av.labs)) +
+    theme_pubr() +
+    scale_fill_manual(values = scenario.colors,
+                      name = 'Climate policy',
+                      labels = scenario.labs)+
+    scale_color_manual(values = scenario.colors,
+                       name = 'Climate policy',
+                       labels = scenario.labs)+
+    scale_linetype_manual(values = alpha.linetype,
+                          name = 'Elasticity',
+                          labels = alpha.labs)+
+    guides(linewidth = 'none', color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2)),
+           linetype = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
+    theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE, 
+          strip.text = element_text(size = 12), strip.background = element_blank(),
+          axis.title.x = element_text(size = 12), axis.title.y = element_blank(), axis.text.x = element_text(angle = 0, hjust = 0.5), axis.text = element_text(size = 12),
+          legend.key.size = unit(1.5, 'cm'), legend.title = element_text(size = 15), legend.text = element_text(size = 13), legend.position = "bottom")
+  if (remove_xfacet) {
+    pl = pl + theme(strip.text.y = element_blank())
+  }
+  if (!legend) {
+    pl = pl + theme(legend.position = 'none')
+  }
+  
+  pl = pl + theme(legend.key.size = unit(1, 'cm')) + labs(x = '')
+  name = paste0('paper_figures/fig3/distrib_plot_econ_',reg,'_',y,'.png')
+  print(name)
+  ggsave(file=file.path(name), width = 800, height = 300, units = 'mm', plot = pl)
+  
+  return(pl)
+}
+
+#' prob_distrib_econ_main
+#' 
+#' @param df dataset
+#' @param y year
+#' @param remove_xfacet if true, remove facet text x-axis
+#' @param reg region
+#' @param legend TRUE by default; if FALSE, it should be erased
+#' @return Figure: probability distribution of avoided damage
+prob_distrib_econ_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
+  df = df[df$n == reg & df$year == y,]
+  df = data.table(df)
+  datall_medi <- df[, .(medi = quantile(value, 0.5)),
+                    by=c('cb_group','scenario','alpha')]
+  
+  pl <- ggplot(df) +
+    geom_density(data = df, aes(x = value, group = interaction(scenario, alpha),
+                                color = scenario, fill = scenario, linetype = alpha), linewidth = 0.8, alpha = 0.25) +
+    # geom_vline(aes(color = scenario, xintercept = medi), data = datall_medi, linewidth = 2) +
     theme_pubr() +
     scale_fill_manual(values = scenario.colors,
                       name = 'Climate policy',
@@ -546,6 +712,54 @@ cum_fun_econ = function(df, y, remove_xfacet, reg) {
 }
 
 
+#' cum_fun_econ_main
+#' 
+#' @param df dataset
+#' @param y year
+#' @param remove_xfacet if true, remove facet text x-axis
+#' @param reg region
+#' @return Figure: cumulative function of avoided damage
+cum_fun_econ_main = function(df, y, remove_xfacet, reg) {
+  df = df |> filter(n == reg & year == y)
+  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,alpha), summarize,
+                         value = unique(value),
+                         ecdf = ecdf(value)(unique(value)))
+
+  # plot
+  pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = alpha)) +
+    geom_line(linewidth = 0.8, alpha=0.8) +
+    theme_pubr() +
+    scale_color_manual(values = scenario.colors,
+                       name = 'Climate policy',
+                       labels = scenario.labs)+
+    scale_fill_manual(values = scenario.colors,
+                       name = 'Climate policy',
+                       labels = scenario.labs)+
+    scale_linetype_manual(values = alpha.linetype,
+                          name = 'Elasticity',
+                          labels = alpha.labs,)+
+    labs(x = 'US Billion') +
+    guides(color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2)),
+           linetype = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
+    theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
+          strip.text = element_text(size = 12), strip.background = element_blank(),
+          axis.title.x = element_text(size = 12), axis.title.y = element_blank(), axis.text.x = element_text(angle = 0, hjust = 0.5), axis.text = element_text(size = 12),
+          legend.key.size = unit(1.5, 'cm'), legend.title = element_text(size = 15), legend.text = element_text(size = 13), legend.position = "bottom")
+    
+  if (remove_xfacet) {
+    pl = pl + theme(strip.text.x = element_blank())
+  }
+  
+  pl = pl + theme(legend.key.size = unit(1, 'cm'))
+
+  name = paste0('paper_figures/fig3/cumulative_plot_econ_',reg,'_',y,'.png')
+  print(name)
+  ggsave(file=file.path(name), width = 600, height = 200, units = 'mm', plot = pl)
+
+  return(pl)
+}
+
+
 #' sensitivity_plot
 #' 
 #' @param datIni dataset
@@ -561,37 +775,27 @@ m_sensitivity_plot = function(datIni,reg,poll) {
                   mmax  = max(value),
                   mmin  = min(value),
                   mmean  = mean(value)),
-                by = c('year','region','impact_function_group','cb_group',
+                by = c('year','region','cb_group',
                        'scenario', 'ci_level', 'z_level')]
   
-  dat[ci_level == "ciLO", ci_label := "5th"]
-  dat[ci_level == "ciMED", ci_label := "median"]
-  dat[ci_level == "ciHI", ci_label := "95th"]
-  dat[, ci_level := factor(ci_label, levels = c("5th", "median", "95th"))]
+  dat[ci_level == "ciLO", ci_label := "5th %CI"]
+  dat[ci_level == "ciMED", ci_label := "50th %CI"]
+  dat[ci_level == "ciHI", ci_label := "95th %CI"]
+  dat[, ci_level := factor(ci_label, levels = c("5th %CI", "50th %CI", "95th %CI"))]
 
-  dat[z_level == "zLO", z_label := '5th']
-  dat[z_level == "zMED", z_label := 'mean']
-  dat[z_level == "zHI", z_label := '95th']
+  dat[z_level == "zLO", z_label := '5th %CI']
+  dat[z_level == "zMED", z_label := '50th %CI']
+  dat[z_level == "zHI", z_label := '95th %CI']
   dat[z_level == "zUNI", z_label := 'No ZCF\nuncertainty']
-  dat[, z_level := factor(z_label, levels = c('5th','mean','95th','No ZCF\nuncertainty'))]
+  dat[, z_level := factor(z_label, levels = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty'))]
 
-  dat = do_rename_imp_fun_etal(dat)
-  if (poll == 'PM25') {
-    dat$imp_fun_label = fct_rev(factor(dat$imp_fun_label, levels = 
-                                         c('Cohen et al. (2005)','Krewski et al. (2009)',
-                                           'Burnett et al. (2014)','GBD (low) (2015)','GBD (medium) (2015)',
-                                           'GBD (high) (2015)','Burnett et al.\n(with) (2018)',
-                                           'Burnett et al.\n(without) (2018)')))
-  } else {
-    dat$imp_fun_label = fct_rev(factor(dat$imp_fun_label, levels = 
-                                         c('Jerrett et al. (2009)','GBD (2015)')))
-  }
   dat$cb_group <- factor(dat$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))
+  dat$z_level <- fct_rev(factor(dat$z_level, levels = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty')))
   
   pl <- ggplot(dat) +
     geom_errorbar(aes(xmin = c05,
                       xmax = c95,
-                      y = imp_fun_label,
+                      y = z_level,
                       group = interaction(scenario,ci_level,z_level),
                       color = ci_level,
                       linetype = z_level),
@@ -599,13 +803,13 @@ m_sensitivity_plot = function(datIni,reg,poll) {
                   width = 0.33,
                   position = position_dodge(width = 0.5)) +
     geom_point(aes(x = cmed,
-                   y = imp_fun_label,
+                   y = z_level,
                    group = interaction(scenario,ci_level,z_level),
                    shape = scenario),
                position = position_dodge(width = 0.5),
                size = 2.5) +
     geom_point(aes(x = cmed,
-                   y = imp_fun_label,
+                   y = z_level,
                    group = interaction(scenario,ci_level,z_level),
                    color = ci_level,
                    shape = scenario),
@@ -622,8 +826,10 @@ m_sensitivity_plot = function(datIni,reg,poll) {
     scale_color_brewer(palette = "Set1",
                        name = 'Parameter\npercentile') +
     scale_linetype_manual(values = c('dotted','solid','44','3313'),
+                          labels = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty'),
                           name = 'ZCF\npercentile') +
-    labs(title='', x = 'Premature deaths', y = "")
+    labs(title='', x = 'Premature deaths', y = 'ZCF percentile') +
+    guides(shape = 'none')
   
   pl
   
@@ -659,14 +865,8 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
   dat = dat %>%
     mutate(impact_function_group = ifelse(method %in% c('dech_damage_avoided','dong_damage_avoided'),
                                                         'Zero rr fun used', impact_function_group))
-  # %>%
-  #   mutate(imp_fun_label = ifelse(method %in% c('dech_damage_avoided','dong_damage_avoided'),
-  #                                               'Zero rr fun used', imp_fun_label))
   dat = do_rename_meth_etal(dat)
   dat$meth_label = fct_rev(dat$meth_label)
-  # dat$imp_fun_label = ((dat$imp_fun_label))
-  # dat$imp_fun_label = fct_rev(fct_rev(dat$imp_fun_label))
-  # dat$impact_function_group = factor(dat$impact_function_group, levels = fct_rev(dat$impact_function_group))
 
   dat[impact_function_group == "BRUNETT2018_gWITH", imp_fun_label := "Brunett et al.\n(with) (2018)"]
   dat[impact_function_group == "BRUNETT2018_gOUT", imp_fun_label := "Brunett et al.\n(without) (2018)"]
@@ -676,7 +876,7 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
   dat[impact_function_group == "GBD2016_gHI", imp_fun_label := "GBD (high) (2016)"]
   dat[impact_function_group == "KREWSKI2009_gUNI", imp_fun_label := "Krewski et al. (2009)"]
   dat[impact_function_group == "OSTRO2004_gUNI", imp_fun_label := "Cohen et al. (2005)"]
-  dat[impact_function_group == "Zero rr fun used", imp_fun_label := "No rr fun used"]
+  dat[impact_function_group == "Zero rr fun used", imp_fun_label := "No RR function\nused"]
   dat[, impact_function_group := factor(imp_fun_label, levels = c("Brunett et al.\n(with) (2018)",
                                                                   "Brunett et al.\n(without) (2018)",
                                                                   "Burnett et al. (2014)",
@@ -685,7 +885,7 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
                                                                   "GBD (high) (2016)",
                                                                   "Krewski et al. (2009)",
                                                                   "Cohen et al. (2005)",
-                                                                  "No rr fun used"
+                                                                  "No RR function\nused"
                                                                   ))]
   
   pl <- ggplot(dat) +
@@ -721,11 +921,10 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
                        name = 'Climate policy')+
     scale_color_brewer(palette = "Set1",
                        name = 'RR function') +
-    # scale_color_manual(values = regions.colors,
-    #                    name = 'RR function') +
     scale_linetype_manual(values = c('low' = 'dotted', 'medium' = 'solid', 'high' = 'dashed'),
                           name = 'Elasticity') +
-    labs(title='', x = 'US Billion', y = "")
+    labs(title='', x = 'US Billion', y = "") +
+    guides(shape = 'none')
   
   pl
   

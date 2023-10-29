@@ -32,9 +32,12 @@ longpal_alpha_colors = c('EoC.hi'='#040445',
                          'NZ.med'='#43CD80',#3E6DD8',EF2424
                          'EoC.lo'='#7676C8',#F38858,FF9200
                          'NZ.lo'='#77F7B0')#3ED8D7,0BD5CB
-longlabs.alphaCI = c(expression('EoC,' ~ alpha ~ 'high'),expression('NZ, ' ~ alpha ~ 'high'),
-                     expression('EoC,' ~ alpha ~ 'medium'),expression('NZ, ' ~ alpha ~ 'medium'),
-                     expression('EoC,' ~ alpha ~ 'low'),expression('NZ, ' ~ alpha ~ 'low'))
+longlabs.alphaCI = c(expression('EoC, high elasticity'),expression('NZ, high elasticity'),
+                     expression('EoC, medium elasticity'),expression('NZ, medium elasticity'),
+                     expression('EoC, low elasticity'),expression('NZ, low elasticity'))
+# longlabs.alphaCI = c(expression('EoC,' ~ alpha ~ 'high'),expression('NZ, ' ~ alpha ~ 'high'),
+#                      expression('EoC,' ~ alpha ~ 'medium'),expression('NZ, ' ~ alpha ~ 'medium'),
+#                      expression('EoC,' ~ alpha ~ 'low'),expression('NZ, ' ~ alpha ~ 'low'))
 
 alpha.linetype = c('hi'='dashed',
                    'med'='solid',
@@ -42,6 +45,9 @@ alpha.linetype = c('hi'='dashed',
 # alpha.labs = c(expression(alpha ~ ' high'),expression(alpha ~ ' medium'),expression(alpha ~ ' low'))
 alpha.labs = c('high','medium','low')
 names(alpha.labs) <- c("hi", "med", "lo")
+
+quantile.labs = c('5th %CI','50th %CI','95th %CI')
+names(quantile.labs) <- c("v05", "vmed", "v95")
 
 scen.colors = c('EoC'='#C3423F',
                  'NZ'='#5BA1EB')
