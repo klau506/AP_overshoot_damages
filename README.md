@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-_TODO zenodo badge here
+[![DOI](https://zenodo.org/badge/681939290.svg)](https://zenodo.org/doi/10.5281/zenodo.10051008)
 
 ## Beyond the Limit: The air pollution damages of overshooting temperature
 
@@ -26,7 +26,7 @@ Globally, net-zero policies avoid 211 thousand [133-274 95\% CI] premature death
 
 
 ## Code reference
-Available at Zenodo: _TODO zenodo badge here
+Available at Zenodo: [![DOI](https://zenodo.org/badge/681939290.svg)](https://zenodo.org/doi/10.5281/zenodo.10051008)
 
 
 ## Data
