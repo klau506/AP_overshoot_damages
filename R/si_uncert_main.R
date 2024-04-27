@@ -30,6 +30,9 @@ dat_econ$alpha[dat_econ$method %in% c('vsl_damage_avoided') & dat_econ$alpha_ori
 dat_econ$alpha[dat_econ$method %in% c('hcl_damage_avoided') & dat_econ$alpha_original == 'lo'] = 'hi'
 dat_econ$alpha[dat_econ$method %in% c('hcl_damage_avoided') & dat_econ$alpha_original == 'hi'] = 'lo'
 
+# change scale to million premature deaths
+dat3 = dat3 %>% 
+  dplyr::mutate(value = round(value / 1e6, digits = 2))
 
 for (y in c(2030, 2050)) {
   pl_econ_indiv = do_econ_uncert.individual(dat_econ[dat_econ$n != 'WORLD' & dat_econ$year == y,],'allreg') + 

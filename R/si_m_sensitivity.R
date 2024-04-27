@@ -5,6 +5,10 @@
 
 doM_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
   
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   pl_title = paste(poll,reg,sep='_')
   tt = ''
   
@@ -56,8 +60,7 @@ doM_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
           panel.grid.minor.y = element_blank(),
           axis.text.y.left = element_text(size = 12),
           axis.text.x.bottom = element_text(size = 8)) +
-    scale_x_continuous(labels = function(cmed) format(cmed, scientific = TRUE))+
-    guides(x =  guide_axis(n.dodge = 2)) +
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    guides(x =  guide_axis(n.dodge = 2)) +
     scale_shape_manual(values = c(16,17),
                        name = 'Scenario')+
     scale_color_brewer(palette = "Set1",
@@ -152,6 +155,10 @@ doM_FIGURE_CI_sens_by_region = function(dat) {
 
 doM_zcf_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
   
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   pl_title = paste(poll,reg,sep='_')
   tt = ''
   
@@ -203,8 +210,7 @@ doM_zcf_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
           panel.grid.minor.y = element_blank(),
           axis.text.y.left = element_text(size = 12),
           axis.text.x.bottom = element_text(size = 8)) +
-    scale_x_continuous(labels = function(cmed) format(cmed, scientific = TRUE))+
-    guides(x = guide_axis(n.dodge = 2)) +
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    guides(x = guide_axis(n.dodge = 2)) +
     scale_shape_manual(values = c(16,17),
                        name = 'Scenario')+
     scale_color_brewer(palette = "Set2",
@@ -298,6 +304,10 @@ doM_FIGURE_ZCF_sens_by_region = function(dat) {
 
 doM_zcf_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
   
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   pl_title = paste(poll,reg,sep='_')
   tt = ''
   
@@ -365,14 +375,14 @@ doM_zcf_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
           panel.grid.minor.y = element_blank(),
           axis.text.y.left = element_text(size = 12),
           axis.text.x.bottom = element_text(size = 8)) +
-    scale_x_continuous(labels = function(cmed) format(cmed, scientific = TRUE))+
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +
     scale_shape_manual(values = c(16,17),
-                       name = 'Climate policy')+
+                       name = 'Climate policy\ndesign')+
     scale_color_brewer(palette = "Set1",
                        name = 'Parameter\npercentile') +
     scale_linetype_manual(values = c('dotted','solid','44','3313'),
                           name = 'ZCF\npercentile') +
-    labs(title=tt, x = 'Premature deaths', y = "")
+    labs(title=tt, x = 'Premature deaths [million people/year]', y = "")
   
   if(!xx) {
     pl = pl + theme(strip.text.x = element_blank())

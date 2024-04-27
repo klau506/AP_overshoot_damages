@@ -56,15 +56,15 @@ doM_ks_test_preprocess = function(datIni) {
 
 doM_ks_comp_plot = function(ks_all, SI = FALSE) {
   # reorder rr functions
-  ks_all[, impact_function_group := factor(imp_fun_label, levels = c('Ostro et al. (2004)',
+  ks_all[, impact_function_group := factor(imp_fun_label, levels = c('Cohen et al. (2005)',
                                                                      'Krewski et al. (2009)',
                                                                      'Burnett et al. (2014)',
-                                                                     'GBD (low) (2016)',
-                                                                     'GBD (medium) (2016)',
-                                                                     'GBD (high) (2016)',
+                                                                     'GBD (low) (2015)',
+                                                                     'GBD (medium) (2015)',
+                                                                     'GBD (high) (2015)',
                                                                      'Burnett et al.\n(with) (2018)',
                                                                      'Burnett et al.\n(without) (2018)',
-                                                                     'Jerret et al. (2009)',
+                                                                     'Jerrett et al. (2009)',
                                                                      'GBD (2015)'))]
   ks_all = ks_all %>%
     dplyr::mutate(Regions = sapply(ks_all$Regions, do_rename_regions_string))

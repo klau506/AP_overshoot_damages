@@ -10,7 +10,7 @@ doM_av_deaths_map_preprocess = function(datIni) {
   datIni = datIni |> filter(t %in% c(2030,2050))
 
   # consider the average deaths by cb, reg, year, climate policy, poll --> the impact function does not play a role any more
-  dd_all = datIni %>%
+  dd_all_now = datIni %>%
     dplyr::group_by(cb_group,Regions,t,scen,pollutant,ci_z_level,model) %>%
     dplyr::summarise(x = median(value)) %>%
     dplyr::ungroup() %>%
@@ -22,16 +22,25 @@ doM_av_deaths_map_preprocess = function(datIni) {
     dplyr::group_by(cb_group,Regions,t,scen,ci_z_level) %>%
     dplyr::summarise(final_val = median(val_sum)) %>%
     dplyr::ungroup() %>%
-    dplyr::distinct(., .keep_all = FALSE) %>%
+    dplyr::distinct(., .keep_all = FALSE)
+  
+  dd_all_w = dd_all_now %>% 
+    # compute the World deaths by cb_group, t, scen, and ci_z_level
+    dplyr::group_by(cb_group,t,scen,ci_z_level) %>% 
+    dplyr::summarise(final_val = sum(final_val)) %>% 
+    dplyr::mutate(Regions = 'WORLD') %>% 
+    dplyr::ungroup()
+  
+  dd_all = bind_rows(dd_all_w, dd_all_now) %>% 
     # compute the 95% CI
     dplyr::group_by(cb_group,Regions,t,scen) %>%
-    dplyr::reframe(enframe(quantile(final_val, c(0.05, 0.5, 0.95)), "quantile", "final_val")) %>%
+    dplyr::reframe(enframe(c(min(final_val),median(final_val),max(final_val)), "quantile", "final_val")) %>%
     dplyr::ungroup() %>%
     as.data.frame() %>%
     # rename CI
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '50%', 'vmed'))) %>%
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '95%', 'v95'))) %>%
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '5%', 'v05'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '2', 'vmed'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '3', 'vmax'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '1', 'vmin'))) %>%
     dplyr::mutate(final_val = round(final_val, digits = 0))
   
   # split CI values in different columns
@@ -43,9 +52,9 @@ doM_av_deaths_map_preprocess = function(datIni) {
   for (reg in unique(dd_all$Regions)) {
     for (yr in unique(dd_all$t)) {
       dd_all_tmp <- dd_all[Regions == reg & t == yr,
-                           .(v05_REF_full = unique(na.omit(dd_all[Regions == reg & t == yr & cb_group == '>2000']$v05_REF)),
+                           .(vmin_REF_full = unique(na.omit(dd_all[Regions == reg & t == yr & cb_group == '>2000']$vmin_REF)),
                              vmed_REF_full = unique(na.omit(dd_all[Regions == reg & t == yr & cb_group == '>2000']$vmed_REF)),
-                             v95_REF_full = unique(na.omit(dd_all[Regions == reg & t == yr & cb_group == '>2000']$v95_REF))),
+                             vmax_REF_full = unique(na.omit(dd_all[Regions == reg & t == yr & cb_group == '>2000']$vmax_REF))),
                            by = c('t','Regions')]
       
       dd_all_full = rbind(dd_all_full,dd_all_tmp)
@@ -80,9 +89,9 @@ doM_av_deaths_map_nz_minus_eoc_preprocess = function(datIni, map) {
     dplyr::distinct(., .keep_all = FALSE) %>%
     as.data.frame() %>%
     # rename CI
-    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '50th', 'vmed'))) %>%
-    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '95th', 'v95'))) %>%
-    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '5th', 'v05'))) 
+    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '2', 'vmed'))) %>%
+    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '3', 'vmax'))) %>%
+    dplyr::mutate(across('ci_z_level', \(x) str_replace(x, '1', 'vmin'))) 
   
   # split CI values in different columns
   dd_all = pivot_wider(dd_all, values_from = final_val, names_from = ci_z_level)
@@ -90,28 +99,28 @@ doM_av_deaths_map_nz_minus_eoc_preprocess = function(datIni, map) {
   # compute the difference between EoC and NZ
   dd_all = dd_all %>%
     dplyr::filter(scen %in% c('EoC','NZ')) %>%
-    dplyr::select(cb_group,Regions,t,scen,vmed,v05,v95) %>%
-    pivot_wider(names_from = scen, values_from = c(vmed,v05,v95))
+    dplyr::select(cb_group,Regions,t,scen,vmed,vmin,vmax) %>%
+    pivot_wider(names_from = scen, values_from = c(vmed,vmin,vmax))
   
   dd_all = dd_all %>%
     dplyr::group_by(cb_group,Regions,t) %>%
     dplyr::mutate(vmed = vmed_EoC - vmed_NZ) %>%
-    dplyr::mutate(v05 = v05_EoC - v05_NZ) %>%
-    dplyr::mutate(v95 = v95_EoC - v95_NZ) %>%
+    dplyr::mutate(vmin = vmin_EoC - vmin_NZ) %>%
+    dplyr::mutate(vmax = vmax_EoC - vmax_NZ) %>%
     as.data.table()
   
   dd_sel = dd_all %>%
-    dplyr::select(cb_group, Regions, t, vmed, v05, v95) %>%
+    dplyr::select(cb_group, Regions, t, vmed, vmin, vmax) %>%
     dplyr::distinct(., .keep_all = FALSE)
 
   if(map) {
     dd = dd_sel %>%
-      pivot_longer(c("v05","vmed","v95"), names_to = "per_comp", values_to = "val_comp")
+      pivot_longer(c("vmin","vmed","vmax"), names_to = "per_comp", values_to = "val_comp")
     dat = data.table(dd)
-    dat[per_comp == "v05", per_label := '5th']
+    dat[per_comp == "vmin", per_label := 'min']
     dat[per_comp == "vmed", per_label := 'median']
-    dat[per_comp == "v95", per_label := '95th']
-    dat[, per_comp := factor(per_label, levels = c('5th','median','95th'))]
+    dat[per_comp == "vmax", per_label := 'max']
+    dat[, per_comp := factor(per_label, levels = c('min','median','max'))]
     dat = as_tibble(dat)
   } else {
     dat = dd_sel
@@ -128,14 +137,14 @@ doM_av_deaths_map_select_climate_policy = function(dat,map) {
   
   dd_sel = dat %>%
     dplyr::mutate('vmed_ec' = vmed_REF_full - vmed_EoC,
-                  'v05_ec' = v05_REF_full - v05_EoC,
-                  'v95_ec' = v95_REF_full - v95_EoC,
+                  'vmin_ec' = vmin_REF_full - vmin_EoC,
+                  'vmax_ec' = vmax_REF_full - vmax_EoC,
                   'vmed_nz' = vmed_REF_full - vmed_NZ,
-                  'v05_nz' = v05_REF_full - v05_NZ,
-                  'v95_nz' = v95_REF_full - v95_NZ) %>%
+                  'vmin_nz' = vmin_REF_full - vmin_NZ,
+                  'vmax_nz' = vmax_REF_full - vmax_NZ) %>%
     dplyr::select(t, Regions, cb_group, 
-                  vmed_ec, v05_ec, v95_ec,
-                  vmed_nz, v05_nz, v95_nz) %>%
+                  vmed_ec, vmin_ec, vmax_ec,
+                  vmed_nz, vmin_nz, vmax_nz) %>%
     # replace NA values with non-NA values within each group
     group_by(t, Regions, cb_group) %>%
     fill(everything(), .direction = "downup") %>%
@@ -145,18 +154,18 @@ doM_av_deaths_map_select_climate_policy = function(dat,map) {
   df_long <- dd_sel %>%
     pivot_longer(cols = starts_with("v"), 
                  names_to = c(".value", "scen"), 
-                 names_pattern = "(vmed|v05|v95)_(\\w{2})") %>%
+                 names_pattern = "(vmed|vmin|vmax)_(\\w{2})") %>%
     mutate(scen = ifelse(scen == "nz", "NZ", 'EoC')) %>%
     as.data.frame()
   
   if(map) {
     dd = df_long %>%
-      pivot_longer(c("v05","vmed","v95"), names_to = "per_comp", values_to = "val_comp")
+      pivot_longer(c("vmin","vmed","vmax"), names_to = "per_comp", values_to = "val_comp")
     dat = data.table(dd)
-    dat[per_comp == "v05", per_label := '5th']
+    dat[per_comp == "vmin", per_label := 'min']
     dat[per_comp == "vmed", per_label := 'median']
-    dat[per_comp == "v95", per_label := '95th']
-    dat[, per_comp := factor(per_label, levels = c('5th','median','95th'))]
+    dat[per_comp == "vmax", per_label := 'max']
+    dat[, per_comp := factor(per_label, levels = c('min','median','max'))]
     dat = as_tibble(dat)
   } else {
     dat = df_long
@@ -385,14 +394,14 @@ doM_FIGURE_av_deaths_table = function(dat0, slides = FALSE) {
   # }
   
   name_file = ifelse(!slides, dplyr::if_else(unique(dat2$Regions) == 'WORLD',
-                                             "Results/Mort/AvDeaths/av_deaths_table_world",
-                                             "Results/Mort/AvDeaths/av_deaths_table"),
+                                             "Results/Mort/AvDeaths/mM_av_deaths_table_world",
+                                             "Results/Mort/AvDeaths/mM_av_deaths_table"),
                              ifelse(uniqueYear, dplyr::if_else(unique(dat2$Regions) == 'WORLD',
-                                                               paste0("Results/Slides/Mort_av_deaths_table_world_",unique(dat0$t)),
-                                                               paste0("Results/Slides/Mort_av_deaths_table_",unique(dat0$t))),
+                                                               paste0("Results/Slides/mM_Mort_av_deaths_table_world_",unique(dat0$t)),
+                                                               paste0("Results/Slides/mM_Mort_av_deaths_table_",unique(dat0$t))),
                                     dplyr::if_else(unique(dat2$Regions) == 'WORLD',
-                                                   "Results/Slides/Mort_av_deaths_table_world",
-                                                   "Results/Slides/Mort_av_deaths_table")))
+                                                   "Results/Slides/mM_Mort_av_deaths_table_world",
+                                                   "Results/Slides/mM_Mort_av_deaths_table")))
   print(name_file)
   h = dplyr::if_else(unique(dat2$Regions) == 'WORLD', 100,
                      dplyr::if_else(!slides, 300, 
@@ -409,7 +418,7 @@ do_av_deaths_table = function(dat,cp,yr,ylab) {
   
   pl = ggplot(data = dat[t == yr], aes(x = cb_group, y = Regions)) +
     geom_tile(data = dat[t == yr & !is.na(dat$vmed)], aes(fill = vmed)) +
-    geom_text(aes(label = paste0(round(vmed, 1),'\n','(',round(v05, 1),', ',round(v95, 1),')')), size = 3.2) +
+    geom_text(aes(label = paste0(round(vmed, 1),'\n','(',round(vmin, 1),', ',round(vmax, 1),')')), size = 3.2) +
     scale_fill_gradient("Deaths", low = "#f7e665", high = "#2b8a07") +
     theme_bw() +
     labs(x = "\n Carbon budget", y = "Region",

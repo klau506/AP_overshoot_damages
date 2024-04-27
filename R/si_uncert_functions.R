@@ -99,13 +99,12 @@ do_mort_uncert.individual = function(dat_to_plot,reg) {
     geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') +
     facet_grid(. ~ year) +
     scale_x_discrete(guide = guide_axis(n.dodge=2)) +
-    scale_y_continuous(labels = function(x) scales::scientific_format()(x)) +
-    theme_pubr() +
+    scale_y_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    theme_pubr() +
     theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
           strip.text = element_text(size = 20), strip.background = element_blank(),
           axis.title = element_text(size = 20), axis.text = element_text(size = 15),
           legend.position = "none") +
-    labs(y = 'Premature deaths', x = 'Uncertainty sources')
+    labs(y = 'Premature deaths [million people/year]', x = 'Uncertainty sources')
   
   pl_indiv
   name = paste0('paper_figures/SI/uncert/indiv_uncert_mort_',reg,'_',unique(dat_indiv$year),'.pdf')
@@ -217,13 +216,13 @@ do_mort_uncert.propagation = function(dat_to_plot,reg) {
     geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') +
     facet_grid(. ~ year) +
     scale_x_discrete(guide = guide_axis(n.dodge=2)) +
-    scale_y_continuous(labels = function(x) scales::scientific_format()(x)) +
+    scale_y_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    theme_pubr() +
     theme_pubr() +
     theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
           strip.text = element_text(size = 20), strip.background = element_blank(),
           axis.title = element_text(size = 20), axis.text = element_text(size = 15),
           legend.position = "none") +
-    labs(y = 'Premature deaths', x = 'Added uncertainty sources')
+    labs(y = 'Premature deaths [million people/year]', x = 'Added uncertainty sources')
   
   pl_prop
   name = paste0('paper_figures/SI/uncert/prop_uncert_mort_',reg,'_',unique(dat_prop$year),'.pdf')
@@ -372,6 +371,7 @@ do_econ_uncert.individual = function(dat_to_plot,reg) {
     geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') +
     facet_grid(. ~ year) +
     scale_x_discrete(guide = guide_axis(n.dodge=2)) +
+    scale_y_continuous(labels = scales::comma) +
     theme_pubr() + 
     theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
           strip.text = element_text(size = 20), strip.background = element_blank(),
@@ -520,6 +520,7 @@ do_econ_uncert.propagation = function(dat_to_plot,reg) {
     geom_hline(yintercept = 0, color = 'grey', linetype = 'dotted') +
     facet_grid(. ~ year) +
     scale_x_discrete(guide = guide_axis(n.dodge=2)) +
+    scale_y_continuous(labels = scales::comma) +
     theme_pubr() +
     theme(panel.background = element_rect(fill = 'white'), panel.grid.major = element_line(colour = "grey90"), panel.ontop = FALSE,
           strip.text = element_text(size = 20), strip.background = element_blank(),

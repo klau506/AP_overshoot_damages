@@ -138,9 +138,9 @@ doM_plot_bad_tails_prob = function(datIni,th,SI = TRUE,poll = 'PM25') {
       ggtitle('2030') +
       xlab('Year') + ylab('Exceedance probability') +
       scale_color_manual(values = scenario.colors,
-                         name = 'Climate Policy')+
+                         name = 'Climate policy design')+
       scale_fill_manual(values = scenario.colors,
-                        name = 'Climate Policy')
+                        name = 'Climate policy design')
     if (SI) {
       pl_2030 <- pl_2030 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
                                  strip.text.y = element_blank(), axis.title.x = element_blank())

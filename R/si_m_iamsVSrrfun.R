@@ -43,12 +43,11 @@ do_iams_plot = function(datIni, poll, save) {
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
           axis.text.x = element_text(size = 10),axis.text.y = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
-    scale_x_continuous(labels = function(value) format(value, scientific = TRUE)) +
-    scale_fill_manual(values = scenario.colors,
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy') +
     scale_color_manual(values = scenario.colors,
                        name = 'Climate\npolicy') +
-    labs(title='', x = 'Premature deaths', y = "Probability density\n\n\n")
+    labs(title='', x = 'Premature deaths [million people/year]', y = "Probability density\n\n\n")
   
   if(save) {
     h = as.integer(length(unique(dat_to_plot$impact_function_group)))*37.5
@@ -77,12 +76,11 @@ do_impfun_plot = function(datIni, poll, save) {
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
           axis.text.x = element_text(size = 10),axis.text.y = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
-    scale_x_continuous(labels = function(value) format(value, scientific = TRUE))+
-    scale_fill_manual(values = scenario.colors,
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy')+
     scale_color_manual(values = scenario.colors,
                        name = 'Climate\npolicy')+
-    labs(title='', x = 'Premature deaths', y = "Probability density\n")
+    labs(title='', x = 'Premature deaths [million people/year]', y = "Probability density\n")
   
   if(save) {
     h = as.integer(length(unique(dat_to_plot$impact_function_group)))*37.5
@@ -99,9 +97,29 @@ do_impfun_plot = function(datIni, poll, save) {
 
 # do figure by region
 doM_iams_rrfun = function(datIni, legend = TRUE) {
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   for (poll in unique(datIni$pollutant)) {
     dat_to_plot = do_iams_vs_impfun_pre(datIni, poll)
     str(dat_to_plot)
+    
+    # CI of medi_iams (median across IAMs)
+    ci_medi_iams <- dat_to_plot %>% 
+      dplyr::select(scenario, cb_group, year, pollutant, model_label, medi_iams) %>% 
+      unique()
+    ci_medi_iams_quantiles <- c(min(ci_medi_iams$medi_iams), median(ci_medi_iams$medi_iams), max(ci_medi_iams$medi_iams))
+    print("The min-max for the medians accross IAMs is ")
+    print(ci_medi_iams_quantiles)
+
+    # CI of medi_impfun (median across RR function)
+    ci_medi_impfun <- dat_to_plot %>% 
+      dplyr::select(scenario, cb_group, year, pollutant, imp_fun_label, medi_impfun) %>% 
+      unique()
+    ci_medi_impfun_quantiles <- c(min(ci_medi_impfun$medi_impfun), median(ci_medi_impfun$medi_impfun), max(ci_medi_impfun$medi_impfun))
+    print("The min-max for the medians accross RR functions is ")
+    print(ci_medi_impfun_quantiles)
     
     for (cb in unique(dat_to_plot$cb_group)) {
       pl_impfun <<- do_impfun_plot(dat_to_plot %>% filter(cb_group == cb), poll, save = TRUE)

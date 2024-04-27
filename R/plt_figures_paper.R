@@ -25,12 +25,16 @@ source('plt_figures_kstest.R')
 #################################################################################################
 #                                           PRE-PROCESS                                         #
 #################################################################################################
+## change US$2010 to US$2020
+GDP_incr = 1.182807
+
 ## load the dfs
 df_av = load_df_av()
 df_vsl = load_df_vsl()
 df_mort = load_df_mort()
 df_mort_raw = load_raw_df_mort()
 df_mort_w_raw = load_raw_df_w_mort()
+df_pop = load_df_pop()
 
 ################################################################################
 #                       FIG 1: GLOBAL HEALTH CO-BENEFITS                       #
@@ -104,7 +108,7 @@ dattdiff = pivot_longer(dattdiff, cols = c(PM25MORT_GBD2016_HI,PM25MORT_GBD2016_
 dattdiff = dattdiff |> filter(ci_z_level == '50th', cb_group == '<1000')
 y = 2030
 
-m_pl = map_plot(dattdiff,save = FALSE,'av_mort_diff',y) 
+m_pl = map_plot(normalize_deaths(dattdiff, 1e5),save = FALSE,'av_mort_diff',y) 
 # ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.png'), width = 300, height = 100, units = 'mm', plot = m_pl)
 ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', plot = m_pl)
 
@@ -138,8 +142,8 @@ pl = ggdraw() +
   draw_plot(pl_vline, x = 0.235, y = 0.0875, width = 1, height = 0.22) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
                   x = c(0, 0, 0), y = c(0.95, 0.66, 0.32)) +
-  draw_plot_label(label = c("Extended Data Fig1. Global helath co-benefits of reduced overshoot from EoC to NZ climate policy"), size = 23,
-                  x = -0.475, y = 1)
+  draw_plot_label(label = c("Extended Figure: Global health co-benefits of reduced overshoot"), size = 23,
+                  x = -0.3150, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig1/extended_heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 375, unit = 'mm')
 
 # K-S figure for SI
@@ -180,7 +184,7 @@ dattdiff = datt %>%
   mutate(value = EoC - NZ)
 
 
-m_pl_main = map_plot(dattdiff %>%
+m_pl_main = map_plot(normalize_deaths(dattdiff, 1e5) %>%
                   filter(cb_group == '<1000', year == 2030),save = FALSE,'av_mort_diff_main',y) +
   theme(strip.text = element_text(face = "bold", size = 12))
 ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_main_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', plot = m_pl_main)
@@ -213,8 +217,8 @@ pl = ggdraw() +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
                   x = c(0, 0, 0.56), y = c(0.94, 0.5, 0.5)) +
-  draw_plot_label(label = c("Fig1. Global helath co-benefits of reduced overshoot from EoC to NZ climate policy"), size = 19,
-                  x = -0.3295, y = 1)
+  draw_plot_label(label = c("Global health co-benefits of reduced overshoot"), size = 19,
+                  x = -0.190, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig1/heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
 
 
@@ -264,7 +268,7 @@ pl = ggdraw() +
   draw_plot(pl_iams + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none',
                                                axis.text.x = element_text(size = 10)),
             x = 0.01, y = 0, width = 0.45, height = 0.57) +
-  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(), axis.title.y = element_blank(),
+  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(),
                                                  legend.position = 'none',
                                                  axis.text.x = element_text(size = 10)),
             x = 0.5325, y = 0, width = 0.45, height = 0.57) +
@@ -283,14 +287,14 @@ pl = ggdraw() +
   draw_plot(pl_iams + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none',
                                                axis.text.x = element_text(size = 10)),
             x = 0.01, y = 0, width = 0.45, height = 0.55) +
-  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(), axis.title.y = element_blank(),
+  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(), 
                                                  legend.position = 'none',
                                                  axis.text.x = element_text(size = 10)),
             x = 0.5325, y = 0, width = 0.45, height = 0.55) +
   draw_plot_label(label = c("a1", "a2", "b1", "b2"), size = 15,
                   x = c(0, 0.5, 0, 0.5), y = c(0.95, 0.95, 0.55, 0.55)) +
-  draw_plot_label(label = c("Fig2. Health co-benefits uncertainty"), size = 20,
-                  x = -0.1375, y = 1)
+  draw_plot_label(label = c("Health co-benefits uncertainty"), size = 20,
+                  x = -0.122, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig2/heatlh_uncertainty_2030.pdf')), plot = pl, width = 420, height = 200, unit = 'mm')
 
 
@@ -446,8 +450,8 @@ p1 = ggdraw() +
   draw_plot(cpd, x = 0.01, y = 0, width = 0.9, height = 0.39) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
                   x = c(0, 0, 0), y = c(0.95, 0.72, 0.39)) +
-  draw_plot_label(label = c("Extended Fig3. Global economic co-benefits of reduced overshoot from EoC to NZ climate policy"), size = 20,
-                  x = -0.465, y = 1)
+  draw_plot_label(label = c("Extended Figure: Global economic co-benefits of reduced overshoot"), size = 20,
+                  x = -0.330, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig3/extended_econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = p1, width = 350, height = 275, unit = 'mm')
 
 # K-S figure for SI
@@ -521,8 +525,8 @@ pl = ggdraw() +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
                   x = c(0, 0, 0.56), y = c(0.94, 0.5, 0.5)) +
-  draw_plot_label(label = c("Fig3. Global economic co-benefits of reduced overshoot from EoC to NZ climate policy"), size = 19,
-                  x = -0.344, y = 1)
+  draw_plot_label(label = c("Global economic co-benefits of reduced overshoot"), size = 19,
+                  x = -0.203, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
 
 ################################################################################
@@ -644,7 +648,7 @@ pl = ggdraw() +
             x = 0.66, y = 0.065, width = 0.305, height = 0.46) +
   draw_plot_label(label = c("a1 (India)", "a2 (Europe)", "a3 (North Am)", "a4 (Latin Am)", "b1", "b2"), size = 15,
                   x = c(-0.0105, 0.305, -0.025, 0.3, 0.65, 0.65), y = c(0.96, 0.96, 0.51, 0.51, 0.96, 0.51)) +
-  draw_plot_label(label = c("Fig4. Economic co-benefits uncertainty"), size = 20,
-                  x = -0.125, y = 1)
+  draw_plot_label(label = c("Economic co-benefits uncertainty"), size = 20,
+                  x = -0.113, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig4/econ_uncertainty_2030.pdf')), plot = pl, width = 500, height = 275, unit = 'mm')
 

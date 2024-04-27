@@ -31,11 +31,12 @@ doEcon_distrib_plot = function(datIni,reg,yrem) {
           strip.text = element_text(color = 'black', size = 12), strip.background = element_rect(fill = '#e8e8e8'),
           strip.text.y = element_text(size = 10)) +
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
+    scale_x_continuous(labels = scales::comma) +
     scale_fill_manual(values = longpal_alpha_colors,
-                      name = 'Scenario and\nelasticity',
+                      name = 'Climate policy design\nand elasticity',
                       labels = longlabs.alphaCI)+
     scale_color_manual(values = longpal_alpha_colors,
-                       name = 'Scenario and\nelasticity',
+                       name = 'Climate policy design\nand elasticity',
                        labels = longlabs.alphaCI)+
     labs(title='', x = 'US Billion', y = "Probability density")
   pl
@@ -70,10 +71,10 @@ doEcon_cumm_plot = function(datIni,reg,yrem) {
     ggh4x::facet_grid2(cb_group + method ~ year, scales = "free", independent = "all",
                        labeller = labeller(method = method_av.labs)) +
     scale_fill_manual(values = longpal_alpha_colors,
-                      name = 'Scenario and\nelasticity',
+                      name = 'Climate policy design\nand elasticity',
                       labels = longlabs.alphaCI)+
     scale_color_manual(values = longpal_alpha_colors,
-                       name = 'Scenario and\nelasticity',
+                       name = 'Climate policy design\nand elasticity',
                        labels = longlabs.alphaCI)+
     theme_pubr() +
     theme(panel.background = element_rect(fill = 'grey99'), panel.grid.major = element_line(colour = "grey90"),
@@ -81,6 +82,7 @@ doEcon_cumm_plot = function(datIni,reg,yrem) {
           strip.text = element_text(color = 'black', size = 12), strip.background = element_rect(fill = '#e8e8e8'),
           strip.text.y = element_text(size = 10)) +
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
+    scale_x_continuous(labels = scales::comma) +
     labs(title='', x = 'US Billion', y = "Cumulative frequency")
   pl
   

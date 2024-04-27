@@ -9,7 +9,7 @@ library(rnaturalearthdata)
 doEcon_co_benefits_map_preprocess = function(dd) {
 
   # consider the average deaths by cb, reg, year, climate policy, poll --> the impact function does not play a role any more
-  dd_all = dd %>%
+  dd_all_now = dd %>%
     dplyr::group_by(cb_group,region,year,scenario,alpha,model,method) %>%
     dplyr::summarise(x = median(value)) %>%
     dplyr::ungroup() %>%
@@ -21,16 +21,25 @@ doEcon_co_benefits_map_preprocess = function(dd) {
     dplyr::group_by(cb_group,region,year,scenario,alpha) %>%
     dplyr::summarise(final_val = median(val)) %>%
     dplyr::ungroup() %>%
-    dplyr::distinct(., .keep_all = FALSE) %>%
+    dplyr::distinct(., .keep_all = FALSE)
+  
+  dd_all_w = dd_all_now %>% 
+    # compute the World av. damages by cb_group, year, scenario, and alpha
+    dplyr::group_by(cb_group,year,scenario,alpha) %>% 
+    dplyr::summarise(final_val = sum(final_val)) %>% 
+    dplyr::mutate(region = 'WORLD') %>% 
+    dplyr::ungroup()
+  
+  dd_all = bind_rows(dd_all_w, dd_all_now) %>% 
     # compute the 95% CI
     dplyr::group_by(cb_group,region,year,scenario) %>%
-    dplyr::reframe(enframe(quantile(final_val, c(0.05, 0.5, 0.95)), "quantile", "final_val")) %>%
+    dplyr::reframe(enframe(c(min(final_val),median(final_val),max(final_val)), "quantile", "final_val")) %>%
     dplyr::ungroup() %>%
     as.data.frame() %>%
     # rename CI
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '50%', 'vmed'))) %>%
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '95%', 'v95'))) %>%
-    dplyr::mutate(across('quantile', \(x) str_replace(x, '5%', 'v05'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '2', 'vmed'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '3', 'vmax'))) %>%
+    dplyr::mutate(across('quantile', \(x) str_replace(x, '1', 'vmin'))) %>%
     dplyr::mutate(final_val = round(final_val, digits = 2))
   
   # split CI values in different columns
@@ -42,9 +51,9 @@ doEcon_co_benefits_map_preprocess = function(dd) {
   for (reg in unique(dd_all$region)) {
     for (yr in unique(dd_all$year)) {
       dd_all_tmp <- dd_all[region == reg & year == yr,
-                           .(v05_REF_full = unique(na.omit(dd_all[region == reg & year == yr & cb_group == '>2000']$v05_REF)),
+                           .(vmin_REF_full = unique(na.omit(dd_all[region == reg & year == yr & cb_group == '>2000']$vmin_REF)),
                              vmed_REF_full = unique(na.omit(dd_all[region == reg & year == yr & cb_group == '>2000']$vmed_REF)),
-                             v95_REF_full = unique(na.omit(dd_all[region == reg & year == yr & cb_group == '>2000']$v95_REF))),
+                             vmax_REF_full = unique(na.omit(dd_all[region == reg & year == yr & cb_group == '>2000']$vmax_REF))),
                            by = c('year','region')]
       
       dd_all_full = rbind(dd_all_full,dd_all_tmp)
@@ -79,8 +88,8 @@ doEcon_co_benefits_map_nz_minus_eoc_preprocess = function(dd, map) {
     as.data.frame() %>%
     # rename CI
     dplyr::mutate(across('alpha', \(x) str_replace(x, 'med', 'vmed'))) %>%
-    dplyr::mutate(across('alpha', \(x) str_replace(x, 'hi', 'v95'))) %>%
-    dplyr::mutate(across('alpha', \(x) str_replace(x, 'lo', 'v05'))) 
+    dplyr::mutate(across('alpha', \(x) str_replace(x, 'hi', 'vmax'))) %>%
+    dplyr::mutate(across('alpha', \(x) str_replace(x, 'lo', 'vmin'))) 
   
   # split CI values in different columns
   dd_all = pivot_wider(dd_all, values_from = final_val, names_from = c(alpha,scenario))
@@ -89,18 +98,18 @@ doEcon_co_benefits_map_nz_minus_eoc_preprocess = function(dd, map) {
   dd_all = dd_all %>%
     dplyr::group_by(cb_group,region,year) %>%
     dplyr::summarise(vmed = vmed_NZ - vmed_EoC,
-                     v05 = v05_NZ - v05_EoC,
-                     v95 = v95_NZ - v95_EoC) %>%
+                     vmin = vmin_NZ - vmin_EoC,
+                     vmax = vmax_NZ - vmax_EoC) %>%
     as.data.table()
 
   if(map) {
     dd = dd_all %>%
-      pivot_longer(c("v05","vmed","v95"), names_to = "per_comp", values_to = "val_comp")
+      pivot_longer(c("vmin","vmed","vmax"), names_to = "per_comp", values_to = "val_comp")
     dat = data.table(dd)
-    dat$per_label[dat$per_comp == "v05"] ='5th'
+    dat$per_label[dat$per_comp == "vmin"] ='min'
     dat$per_label[dat$per_comp == "vmed"] ='median'
-    dat$per_label[dat$per_comp == "v95"] ='95th'
-    dat[, per_comp := factor(per_label, levels = c('5th','median','95th'))]
+    dat$per_label[dat$per_comp == "vmax"] ='max'
+    dat[, per_comp := factor(per_label, levels = c('min','median','max'))]
     dat = as_tibble(dat)
   } else {
     dat = dd_sel
@@ -117,14 +126,14 @@ doEcon_co_benefits_map_select_climate_policy = function(dat,map) {
   
   dd_sel = dat %>%
     dplyr::mutate('vmed_ec' = vmed_EoC - vmed_REF_full,
-                  'v05_ec' = v05_EoC - v05_REF_full,
-                  'v95_ec' = v95_EoC - v95_REF_full,
+                  'vmin_ec' = vmin_EoC - vmin_REF_full,
+                  'vmax_ec' = vmax_EoC - vmax_REF_full,
                   'vmed_nz' = vmed_NZ - vmed_REF_full,
-                  'v05_nz' = v05_NZ - v05_REF_full,
-                  'v95_nz' = v95_NZ - v95_REF_full) %>%
+                  'vmin_nz' = vmin_NZ - vmin_REF_full,
+                  'vmax_nz' = vmax_NZ - vmax_REF_full) %>%
     dplyr::select(year, region, cb_group, 
-                  vmed_ec, v05_ec, v95_ec,
-                  vmed_nz, v05_nz, v95_nz) %>%
+                  vmed_ec, vmin_ec, vmax_ec,
+                  vmed_nz, vmin_nz, vmax_nz) %>%
     # replace NA values with non-NA values within each group
     group_by(year, region, cb_group) %>%
     fill(everything(), .direction = "downup") %>%
@@ -134,19 +143,19 @@ doEcon_co_benefits_map_select_climate_policy = function(dat,map) {
   df_long <- dd_sel %>%
     pivot_longer(cols = starts_with("v"), 
                  names_to = c(".value", "scenario"), 
-                 names_pattern = "(vmed|v05|v95)_(\\w{2})") %>%
+                 names_pattern = "(vmed|vmin|vmax)_(\\w{2})") %>%
     mutate(scenario = ifelse(scenario == "nz", "NZ", 'EoC')) %>%
     as.data.frame()
 
 
   if(map) {
     dd = df_long %>%
-      pivot_longer(c("v05","vmed","v95"), names_to = "per_comp", values_to = "val_comp")
+      pivot_longer(c("vmin","vmed","vmax"), names_to = "per_comp", values_to = "val_comp")
     dat = data.table(dd)
-    dat[per_comp == "v05", per_label := '5th']
+    dat[per_comp == "vmin", per_label := 'min']
     dat[per_comp == "vmed", per_label := 'median']
-    dat[per_comp == "v95", per_label := '95th']
-    dat[, per_comp := factor(per_label, levels = c('5th','median','95th'))]
+    dat[per_comp == "vmax", per_label := 'max']
+    dat[, per_comp := factor(per_label, levels = c('min','median','max'))]
     dat = as_tibble(dat)
   } else {
     dat = df_long
@@ -386,14 +395,14 @@ doEcon_FIGURE_co_benefits_table = function(dat0, slides = FALSE) {
   }
 
   name_file = ifelse(!slides, dplyr::if_else(unique(dat2$region) == 'WORLD',
-                                             "Results/Econ/CoBenefits/co_benefits_table_world",
-                                             "Results/Econ/CoBenefits/co_benefits_table"),
+                                             "Results/Econ/CoBenefits/mM_co_benefits_table_world",
+                                             "Results/Econ/CoBenefits/mM_co_benefits_table"),
                      ifelse(uniqueYear, dplyr::if_else(unique(dat2$region) == 'WORLD',
-                                                       paste0("Results/Slides/Econ_CoBenefits_co_benefits_table_world_",unique(dat0$t)),
-                                                       paste0("Results/Slides/Econ_CoBenefits_co_benefits_table_",unique(dat0$t))),
+                                                       paste0("Results/Slides/mM_Econ_CoBenefits_co_benefits_table_world_",unique(dat0$t)),
+                                                       paste0("Results/Slides/mM_Econ_CoBenefits_co_benefits_table_",unique(dat0$t))),
                             dplyr::if_else(unique(dat2$region) == 'WORLD',
-                                           "Results/Slides/Econ_CoBenefits_co_benefits_table_world",
-                                           "Results/Slides/Econ_CoBenefits_co_benefits_table")))
+                                           "Results/Slides/mM_Econ_CoBenefits_co_benefits_table_world",
+                                           "Results/Slides/mM_Econ_CoBenefits_co_benefits_table")))
   print(name_file)
   h = dplyr::if_else(unique(dat2$region) == 'WORLD', 100,
                      dplyr::if_else(!slides, 300, 
@@ -409,7 +418,7 @@ doEcon_co_benefits_table = function(dat,cp,yr,ylab) {
   
   pl = ggplot(data = dat[year == yr], aes(x = cb_group, y = region)) +
     geom_tile(data = dat[year == yr & !is.na(dat$vmed)], aes(fill = vmed)) +
-    geom_text(aes(label = paste(round(vmed, 2),'\n','(',round(v05, 2),',',round(v95, 2),')')), size = 3.2) +
+    geom_text(aes(label = paste(round(vmed, 2),'\n','(',round(vmin, 2),',',round(vmax, 2),')')), size = 3.2) +
     scale_fill_gradient("Economic co-benefits  \n[US Billion]", low = "#f7e665", high = "#2b8a07") +
     theme_bw() +
     labs(x = "\n Carbon budget", y = "Region",

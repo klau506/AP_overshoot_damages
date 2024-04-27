@@ -38,7 +38,12 @@ longlabs.alphaCI = c(expression('EoC, high elasticity'),expression('NZ, high ela
 # longlabs.alphaCI = c(expression('EoC,' ~ alpha ~ 'high'),expression('NZ, ' ~ alpha ~ 'high'),
 #                      expression('EoC,' ~ alpha ~ 'medium'),expression('NZ, ' ~ alpha ~ 'medium'),
 #                      expression('EoC,' ~ alpha ~ 'low'),expression('NZ, ' ~ alpha ~ 'low'))
-
+shortpal_linetype = c('5th %CI'='dotted',
+                      '50th %CI'='solid',
+                      '95th %CI'='44',
+                      'No ZCF\nuncertainty'='3313')
+shortpal_linetype.labs = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty')
+                      
 alpha.linetype = c('hi'='dashed',
                    'med'='solid',
                    'lo'='dotted')

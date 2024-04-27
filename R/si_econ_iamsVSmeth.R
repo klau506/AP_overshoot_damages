@@ -31,7 +31,7 @@ do_iams_plot = function(datIni, save) {
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
           axis.text = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
-    scale_x_continuous(labels = function(value) format(value, scientific = TRUE)) +
+    scale_x_continuous(labels = scales::comma) +
     scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy') +
     scale_color_manual(values = scenario.colors,
@@ -66,7 +66,7 @@ do_meth_plot = function(datIni, save) {
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
           axis.text = element_text(size = 10),
           strip.background = element_rect(fill = 'white', color = 'white')) +
-    scale_x_continuous(labels = function(value) format(value, scientific = TRUE))+
+    scale_x_continuous(labels = scales::comma) +
     scale_fill_manual(values = scenario.colors,
                       name = 'Climate\npolicy')+
     scale_color_manual(values = scenario.colors,
@@ -89,6 +89,23 @@ do_meth_plot = function(datIni, save) {
 # do figure by region
 doEcon_iams_meth = function(datIni, legend = TRUE) {
   dat_to_plot = do_iams_vs_meth_pre(datIni)
+  
+  # CI of medi_iams (median across IAMs)
+  ci_medi_iams <- dat_to_plot %>% 
+    dplyr::select(scenario, cb_group, year, model_label, medi_iams) %>% 
+    unique()
+  ci_medi_iams_quantiles <- c(min(ci_medi_iams$medi_iams), median(ci_medi_iams$medi_iams), max(ci_medi_iams$medi_iams))
+  print("The min-max for the medians accross IAMs is ")
+  print(ci_medi_iams_quantiles)
+  
+  # CI of medi_meth (median across damage functions)
+  ci_medi_meth <- dat_to_plot %>% 
+    dplyr::select(scenario, cb_group, year, method, medi_meth) %>% 
+    unique()
+  ci_medi_meth_quantiles <- c(min(ci_medi_meth$medi_meth), median(ci_medi_meth$medi_meth), max(ci_medi_meth$medi_meth))
+  print("The min-max for the medians accross damage functions is ")
+  print(ci_medi_meth_quantiles)
+  
   
   for (cb in unique(dat_to_plot$cb_group)) {
     pl_meth <<- do_meth_plot(dat_to_plot %>% filter(cb_group == cb), save = TRUE)

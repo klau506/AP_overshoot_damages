@@ -64,7 +64,7 @@ doEcon_ks_comp_plot = function(ks_all, slides = FALSE) {
     scale_shape_manual(values = c(15,16,17,18),
                        name = 'Econ. methods',
                        labels = method_av.labs) +
-    labs(title='Scenario dependency', x = 'Carbon budget', y = "p-value") +
+    labs(title='Climate policy design dependency', x = 'Carbon budget', y = "p-value") +
     guides(color = guide_legend(order = 1), shape = guide_legend(order = 2))
   
   if (slides) {

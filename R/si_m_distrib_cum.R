@@ -10,6 +10,10 @@
 #cblab = TRUE if the cb_groups should be displayed, FALSE otherwise
 #xxbb = OX label
 doM_distrib_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   dat_to_plot = datIni |> filter(t %in% c(2030,2050) & Regions == reg &
                                    pollutant == poll & scen != 'REF') %>%
     as.data.table()
@@ -35,12 +39,12 @@ doM_distrib_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
     facet_grid(cb_group+impact_function_group ~ t, scales='free',
                labeller = labeller(impact_function_group = impact_function_group_2lines.labs))+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
-    # scale_y_continuous(breaks = custom_y_labels) +
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +
     scale_fill_manual(values = longpal_impfun_colors_th,
-                      name = 'Climate policy\nand 95% CI',
+                      name = 'Climate policy design\n and 95% CI',
                       labels = longlabs.impfunCI) +
     scale_color_manual(values = longpal_impfun_colors_th,
-                       name = 'Climate policy\nand 95% CI',
+                       name = 'Climate policy design\n and 95% CI',
                        labels = longlabs.impfunCI) +
     labs(title='', x = xxbb, y = "Probability density") +
     theme_pubr() +
@@ -72,6 +76,10 @@ doM_distrib_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
 #cblab = TRUE if the cb_groups should be displayed, FALSE otherwise
 #xxbb = OX label
 doM_cumm_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
+  # change scale to million premature deaths
+  datIni = datIni %>% 
+    dplyr::mutate(value = round(value / 1e6, digits = 2))
+  
   dat_to_plot = datIni |> filter(t %in% c(2030,2050) & Regions == reg
                                  & pollutant == poll & scen != 'REF')
   
@@ -91,13 +99,14 @@ doM_cumm_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
     facet_grid(cb_group+impact_function_group ~ t, scales='free',
                labeller = labeller(impact_function_group = impact_function_group_2lines.labs))+
     scale_fill_manual(values = longpal_impfun_colors_th,
-                      name = 'Climate policy\nand 95% CI',
+                      name = 'Climate policy design\n and 95% CI',
                       labels = longlabs.impfunCI)+
     scale_color_manual(values = longpal_impfun_colors_th,
-                       name = 'Climate policy\nand 95% CI',
+                       name = 'Climate policy design\n and 95% CI',
                        labels = longlabs.impfunCI)+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
     scale_y_continuous(breaks = custom_y_labels) +
+    scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +
     labs(title='', x = xxbb, y = "Cumulative frequency") +
     theme_pubr() +
     theme(panel.background = element_rect(fill = 'grey99'), panel.grid.major = element_line(colour = "grey90"),
@@ -125,10 +134,10 @@ doM_cumm_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
 M_cum_distrib_plot = function(dat,reg) {
   dat = dat |> filter(t %in% c(2030,2050) & Regions == reg)
   
-  pl_pm25_d = doM_distrib_plot(dat,reg,'PM25',T,T,'Premature deaths [people/year]')
-  pl_o3_d = doM_distrib_plot(dat,reg,'O3',T,T,'Premature deaths [people/year]')
-  pl_pm25_c = doM_cumm_plot(dat,reg,'PM25',T,T,expression(paste('Premature deaths [people/year]')))
-  pl_o3_c = doM_cumm_plot(dat,reg,'O3',T,T,expression(paste('Premature deaths [people/year]')))
+  pl_pm25_d = doM_distrib_plot(dat,reg,'PM25',T,T,'Premature deaths [million people/year]')
+  pl_o3_d = doM_distrib_plot(dat,reg,'O3',T,T,'Premature deaths [million people/year]')
+  pl_pm25_c = doM_cumm_plot(dat,reg,'PM25',T,T,expression(paste('Premature deaths [million people/year]')))
+  pl_o3_c = doM_cumm_plot(dat,reg,'O3',T,T,expression(paste('Premature deaths [million people/year]')))
   
   fig_pm25 = ggarrange(pl_pm25_d + font("title", size = 8),
                        pl_pm25_c + font("title", size = 8),

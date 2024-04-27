@@ -62,11 +62,9 @@ doM_FIGURE_ZCF_CI_sens_by_region(datMort_raw)
 source('si_m_numdeaths.R')
 do_numdeaths_folder()
 doM_FIGURE_num_deaths(datMort[Regions != 'WORLD'])
-doM_FIGURE_num_deaths(datMort[Regions == 'WORLD'])
 source('si_m_avdeaths.R')
 doM_AvDeaths_folder()
 doM_FIGURE_av_deaths_table(datMort[Regions != 'WORLD']) # (NZ or EoC) - REF
-doM_FIGURE_av_deaths_table(datMort[Regions == 'WORLD']) # (NZ or EoC) - REF
 doM_FIGURE_av_deaths_map(datMort[Regions != 'WORLD']) # (NZ or EoC) - REF
 doM_FIGURE_av_deaths_nz_minus_eoc_map(datMort[Regions != 'WORLD']) # NZ values - EoC values
 doM_FIGURE_av_deaths_map_by_year(datMort[Regions != 'WORLD']) # (NZ or EoC) - REF

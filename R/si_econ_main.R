@@ -44,7 +44,6 @@ doEcon_FIGURE_distrib_cum(datt %>% dplyr::filter(scenario != 'REF'), slides = FA
 source('si_econ_cobenefits.R')
 doEcon_CoBenefits_folder()
 doEcon_FIGURE_co_benefits_table(datt %>% filter(region != 'WORLD')) # (NZ or EoC) - REF
-doEcon_FIGURE_co_benefits_table(datt %>% filter(region == 'WORLD')) # (NZ or EoC) - REF
 doEcon_FIGURE_co_benefits_map(datt %>% filter(region != 'WORLD')) # (NZ or EoC) - REF
 doEcon_FIGURE_co_benefits_nz_minus_eoc_map(datt %>% filter(region != 'WORLD')) # NZ values - EoC values
 doEcon_FIGURE_co_benefits_map_by_year(datt %>% filter(region != 'WORLD')) # (NZ or EoC) - REF
@@ -68,3 +67,6 @@ doEcon_gsa(datt %>% filter(region != 'WORLD'))
 source('si_econ_iamsVSmeth.R')
 doEcon_iams_meth(datt %>% filter(region == 'WORLD'))
 
+# SI elast CI sensitivity
+source('si_econ_sensitivity.R')
+doEcon_FIGURE_Elast_CI_sens_by_region(datt)

@@ -63,9 +63,9 @@ do_distrib_plot = function(datIni,reg,poll,xx,yy,xxbb,E) {
                data = datall_medi, linetype="dashed", linewidth = 1) +
     facet_grid(cb_group ~ year,scales='free')+
     scale_color_manual(values = scenario.colors,
-                       name = 'Climate policy')+
+                       name = 'Climate policy design')+
     scale_fill_manual(values = scenario.colors,
-                      name = 'Climate policy')+
+                      name = 'Climate policy design')+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5)+
     scale_y_continuous(breaks = custom_y_labels) +
     labs(title='', x = xxbb, y = "Probability density") + 
@@ -108,9 +108,9 @@ do_cumm_plot = function(datIni,reg,poll,xx,yy,xxbb,E) {
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario)) + geom_line() +
     facet_grid(cb_group ~ year,scales='free')+
     scale_color_manual(values = scenario.colors,
-                       name = 'Climate policy')+
+                       name = 'Climate policy design')+
     scale_fill_manual(values = scenario.colors,
-                      name = 'Climate policy')+
+                      name = 'Climate policy design')+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
     scale_y_continuous(breaks = custom_y_labels) +
     labs(title='', x = xxbb, y = "Cumulative frequency") +

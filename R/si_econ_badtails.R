@@ -115,9 +115,9 @@ doECON_plot_bad_tails_prob = function(datIni,th,SI=TRUE) {
       ggtitle('2030') +
       xlab('Year') + ylab('Exceedance probability') +
       scale_color_manual(values = scenario.colors,
-                         name = 'Climate Policy')+
+                         name = 'Climate policy design')+
       scale_fill_manual(values = scenario.colors,
-                        name = 'Climate Policy')
+                        name = 'Climate policy design')
     if (SI) {
       pl_2030 <- pl_2030 + theme(axis.text.x = element_blank(), axis.ticks.x = element_blank(),
                                  strip.text.y = element_blank(), axis.title.x = element_blank())
@@ -134,9 +134,9 @@ doECON_plot_bad_tails_prob = function(datIni,th,SI=TRUE) {
         ggtitle('2050') +
         xlab('Year') + ylab('') +
         scale_color_manual(values = scenario.colors,
-                           name = 'Climate Policy')+
+                           name = 'Climate policy design')+
         scale_fill_manual(values = scenario.colors,
-                          name = 'Climate Policy')+
+                          name = 'Climate policy design')+
         theme(strip.text.y = element_text(size = 8), axis.text.x = element_blank(),
               axis.ticks.x = element_blank(), axis.title.x = element_blank()) +
         rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5)

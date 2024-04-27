@@ -5,7 +5,7 @@ doM_FIGURE_num_deaths = function(dd) {
   dd = dd |> filter(t %in% c(2030,2050))
 
   # consider the average deaths by cb, reg, year, climate policy, poll --> the impact function does not play a role any more
-  dd_all = dd %>%
+  dd_all_now = dd %>%
     dplyr::group_by(cb_group,Regions,t,scen,pollutant,ci_z_level,model) %>%
     dplyr::summarise(x = median(value)) %>%
     dplyr::ungroup() %>%
@@ -17,7 +17,16 @@ doM_FIGURE_num_deaths = function(dd) {
     dplyr::group_by(cb_group,Regions,t,scen,ci_z_level) %>%
     dplyr::summarise(final_val = median(val_sum)) %>%
     dplyr::ungroup() %>%
-    dplyr::distinct(., .keep_all = FALSE) %>%
+    dplyr::distinct(., .keep_all = FALSE)
+  
+  dd_all_w = dd_all_now %>% 
+    # compute the World deaths by cb_group, t, scen, and ci_z_level
+    dplyr::group_by(cb_group,t,scen,ci_z_level) %>% 
+    dplyr::summarise(final_val = sum(final_val)) %>% 
+    dplyr::mutate(Regions = 'WORLD') %>% 
+    dplyr::ungroup()
+  
+  dd_all = bind_rows(dd_all_w, dd_all_now) %>% 
     # compute the 95% CI
     dplyr::group_by(cb_group,Regions,t,scen) %>%
     dplyr::reframe(enframe(quantile(final_val, c(0.05, 0.5, 0.95)), "quantile", "final_val")) %>%
