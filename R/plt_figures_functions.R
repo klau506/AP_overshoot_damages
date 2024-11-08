@@ -470,7 +470,7 @@ prob_distrib_mort = function(df, y, remove_xfacet, reg, legend = TRUE) {
                data = df_medi, linewidth = 1) +
     facet_wrap(. ~ impact_function_group, nrow = 2, scales = 'free_y',
                labeller = labeller(impact_function_group = impact_function_group.labs)) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_fill_manual(values = scenario.colors,
                       name = 'Policy design',
                       labels = scenario.labs)+
@@ -480,7 +480,7 @@ prob_distrib_mort = function(df, y, remove_xfacet, reg, legend = TRUE) {
     scale_linetype_manual(values = ci_z_level.linestyle,
                           name = 'Parameters & \nCF quantiles',
                           labels = ci_z_level.labs)+
-    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI for RR functions\n(parameters & zcf)", 
                                                        keywidth = 3, override.aes = list(linewidth = 2)),
            color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
     labs(x = 'Premature deaths [million people/year]', y = 'Probability density') +
@@ -529,7 +529,7 @@ prob_distrib_mort_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
                  linewidth = 0.8, alpha = 0.25) +
     geom_vline(aes(color = scenario, xintercept = medi, linetype = ci_z_level),
                data = df_medi, linewidth = 1) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_fill_manual(values = scenario.colors,
                       name = 'Policy design',
                       labels = scenario.labs)+
@@ -539,7 +539,7 @@ prob_distrib_mort_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
     scale_linetype_manual(values = ci_z_level.linestyle,
                           name = 'Parameters & \nCF quantiles',
                           labels = ci_z_level.labs)+
-    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI for RR functions\n(parameters & zcf)", 
                                                        keywidth = 3, override.aes = list(linewidth = 2)),
            color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
     labs(x = 'Premature deaths [million people/year]', y = 'Probabilty density') +
@@ -581,15 +581,19 @@ cum_fun_mort = function(df, y, remove_xfacet, reg) {
     dplyr::mutate(value = round(value / 1e6, digits = 2))
   
   df = df |> filter(n == reg & year == y) #& quantile_name %in% c('v05','vmed','v95'))
-  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,impact_function_group,ci_z_level), summarize,
-                         value = unique(value),
-                         ecdf = ecdf(value)(unique(value)))
+  dat_tmp <- df %>% 
+    dplyr::group_by(scenario, cb_group, impact_function_group, ci_z_level) %>%
+    dplyr::reframe(
+      value = unique(value),
+      ecdf = ecdf(value)(unique(value))
+    ) 
+  
   
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = ci_z_level)) +
     geom_line(linewidth = 0.8) +
     facet_wrap(. ~ impact_function_group, nrow = 2,
                labeller = labeller(impact_function_group = impact_function_group.labs)) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_color_manual(values = scenario.colors,
                        name = 'Policy design',
                        labels = scenario.labs)+
@@ -599,7 +603,7 @@ cum_fun_mort = function(df, y, remove_xfacet, reg) {
     scale_linetype_manual(values = ci_z_level.linestyle,
                           name = 'Parameters & \nCF quantiles',
                           labels = ci_z_level.labs)+
-    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI for RR functions\n(parameters & zcf)", 
                                                        keywidth = 3, override.aes = list(linewidth = 2)),
            color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
     labs(x = 'Premature deaths [million people/year]', y = 'Cumulative probability') +
@@ -635,13 +639,16 @@ cum_fun_mort_main = function(df, y, remove_xfacet, reg) {
     dplyr::mutate(value = round(value / 1e6, digits = 2))
   
   df = df |> filter(n == reg & year == y) #& quantile_name %in% c('v05','vmed','v95'))
-  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,ci_z_level), summarize,
-                         value = unique(value),
-                         ecdf = ecdf(value)(unique(value)))
+  dat_tmp <- df %>% 
+    dplyr::group_by(scenario,cb_group,ci_z_level) %>%
+    dplyr::reframe(
+      value = unique(value),
+      ecdf = ecdf(value)(unique(value))
+    ) 
   
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = ci_z_level)) +
     geom_line(linewidth = 0.8) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_color_manual(values = scenario.colors,
                        name = 'Policy design',
                        labels = scenario.labs)+
@@ -651,7 +658,7 @@ cum_fun_mort_main = function(df, y, remove_xfacet, reg) {
     scale_linetype_manual(values = ci_z_level.linestyle,
                           name = 'Parameters & \nCF quantiles',
                           labels = ci_z_level.labs)+
-    guides(linewidth = 'none', linetype = guide_legend(title = "CI (param & zcf)", 
+    guides(linewidth = 'none', linetype = guide_legend(title = "CI for RR functions\n(parameters & zcf)", 
                                                        keywidth = 3, override.aes = list(linewidth = 2)),
            color = guide_legend(keywidth = 3, override.aes = list(linewidth = 2))) +
     labs(x = 'Premature deaths [million people/year]', y = 'Cumulative probaiblity') +
@@ -697,7 +704,7 @@ prob_distrib_econ = function(df, y, remove_xfacet, reg, legend = TRUE) {
                data = datall_medi, linewidth = 1) +
     facet_wrap(. ~ method, scales = 'free_y', nrow = 1,
                        labeller = labeller(method = method_av.labs)) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_fill_manual(values = scenario.colors,
                       name = 'Policy design',
                       labels = scenario.labs)+
@@ -705,7 +712,7 @@ prob_distrib_econ = function(df, y, remove_xfacet, reg, legend = TRUE) {
                        name = 'Policy design',
                        labels = scenario.labs)+
     scale_linetype_manual(values = alpha.linetype,
-                          name = 'Elasticity',
+                          name = 'CI for damage functions\n(elasticities and RR)',
                           labels = alpha.labs)+
     scale_x_continuous(labels = scales::comma) +
     labs(y = 'Probability density') +
@@ -749,7 +756,7 @@ prob_distrib_econ_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
                                 color = scenario, fill = scenario, linetype = alpha), linewidth = 0.8, alpha = 0.25) +
     geom_vline(aes(color = scenario, xintercept = medi, linetype = alpha), 
                data = datall_medi, linewidth = 1) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_fill_manual(values = scenario.colors,
                       name = 'Policy design',
                       labels = scenario.labs)+
@@ -757,7 +764,7 @@ prob_distrib_econ_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
                        name = 'Policy design',
                        labels = scenario.labs)+
     scale_linetype_manual(values = alpha.linetype,
-                          name = 'Elasticity',
+                          name = 'CI for damage functions\n(elasticities and RR)',
                           labels = alpha.labs)+
     labs(x = 'US Billion', y = 'Probability density') +
     scale_x_continuous(labels = scales::comma) +
@@ -794,16 +801,19 @@ prob_distrib_econ_main = function(df, y, remove_xfacet, reg, legend = TRUE) {
 #' @return Figure: cumulative function of avoided damage
 cum_fun_econ = function(df, y, remove_xfacet, reg) {
   df = df |> filter(n == reg & year == y)
-  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,method,alpha), summarize,
-                         value = unique(value),
-                         ecdf = ecdf(value)(unique(value)))
+  dat_tmp <- df %>% 
+    dplyr::group_by(scenario,cb_group,method,alpha) %>% 
+    dplyr::reframe(
+      value = unique(value),
+      ecdf = ecdf(value)(unique(value))
+      )
 
   # plot
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = alpha)) +
     geom_line(linewidth = 0.8, alpha=0.8) +
     ggh4x::facet_grid2(. ~ method, 
                        labeller = labeller(method = method_av.labs)) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_color_manual(values = scenario.colors,
                        name = 'Policy design',
                        labels = scenario.labs)+
@@ -811,7 +821,7 @@ cum_fun_econ = function(df, y, remove_xfacet, reg) {
                        name = 'Policy design',
                        labels = scenario.labs)+
     scale_linetype_manual(values = alpha.linetype,
-                          name = 'Elasticity',
+                          name = 'CI for damage functions\n(elasticities and RR)',
                           labels = alpha.labs,)+
     labs(x = 'US Billion', y = 'Cumulative probability') +
     scale_x_continuous(labels = scales::comma) +
@@ -845,14 +855,17 @@ cum_fun_econ = function(df, y, remove_xfacet, reg) {
 #' @return Figure: cumulative function of avoided damage
 cum_fun_econ_main = function(df, y, remove_xfacet, reg) {
   df = df |> filter(n == reg & year == y)
-  dat_tmp <- plyr::ddply(df, .(scenario,cb_group,alpha), summarize,
-                         value = unique(value),
-                         ecdf = ecdf(value)(unique(value)))
+  dat_tmp <- df %>% 
+    dplyr::group_by(scenario,cb_group,alpha) %>% 
+    dplyr::reframe(
+      value = unique(value),
+      ecdf = ecdf(value)(unique(value))
+      )
 
   # plot
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = alpha)) +
     geom_line(linewidth = 0.8, alpha=0.8) +
-    theme_pubr() +
+    ggpubr::theme_pubr() +
     scale_color_manual(values = scenario.colors,
                        name = 'Policy design',
                        labels = scenario.labs)+
@@ -860,7 +873,7 @@ cum_fun_econ_main = function(df, y, remove_xfacet, reg) {
                        name = 'Policy design',
                        labels = scenario.labs)+
     scale_linetype_manual(values = alpha.linetype,
-                          name = 'Elasticity',
+                          name = 'CI for damage functions\n(elasticities and RR)',
                           labels = alpha.labs,)+
     labs(x = 'US Billion', y = 'Cumulative probability') +
     scale_x_continuous(labels = scales::comma) +

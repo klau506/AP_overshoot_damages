@@ -508,10 +508,10 @@ pl = ggdraw() +
   draw_plot(dpd_main + 
               theme(legend.position = 'none'), x = 0.02, y = 0.11, width = 0.35, height = 0.4) +
   draw_plot(cpd_main + 
-              theme(legend.position = 'none'), x = 0.59, y = 0.11, width = 0.35, height = 0.4) +
+              theme(legend.position = 'none'), x = 0.62, y = 0.11, width = 0.35, height = 0.4) +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.15, width = 1, height = 1) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0.56), y = c(0.98, 0.53, 0.53))
+                  x = c(0, 0, 0.6), y = c(0.98, 0.53, 0.53))
 ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_notitle_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
 
 
@@ -521,10 +521,10 @@ pl = ggdraw() +
   draw_plot(dpd_main + 
               theme(legend.position = 'none'), x = 0.02, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cpd_main + 
-              theme(legend.position = 'none'), x = 0.59, y = 0.07, width = 0.35, height = 0.4) +
+              theme(legend.position = 'none'), x = 0.62, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
   draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0.56), y = c(0.94, 0.5, 0.5)) +
+                  x = c(0, 0, 0.6), y = c(0.94, 0.5, 0.5)) +
   draw_plot_label(label = c("Global economic co-benefits of reduced overshoot"), size = 19,
                   x = -0.203, y = 1)
 ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
