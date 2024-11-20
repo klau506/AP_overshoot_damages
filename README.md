@@ -42,6 +42,5 @@ To reproduce the results and figures shown in Rodés-Bachs et al.,
 
 ## Funding acknowledgment
 
-<img src="./data/Flag_of_Europe.svg.png" width="80" height="54" align="left" alt="EU logo" />
-This project has received funding from the European Union’s Horizon 2020 research
-and innovation program under grant agreement No. 821471 (ENGAGE).
+<img src="./data/Flag_of_Europe.svg.png" width="126" height="85" align="left" alt="EU logo" />
+This work was funded by the European Union’s Horizon Europe research and innovation program under the ENGAGE - Exploring National and Global Actions to reduce Greenhouse gas Emissions - project (821471),  AdJUST - Advancing the understanding of challenges, policy options and measures to achieve a JUST EU energy transition - project (101069880), and the GRINS - Growing Resilient, INclusive and Sustainable - project (PE00000018).
