@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11077077.svg)](https://doi.org/10.5281/zenodo.11077077)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14191134.svg)](https://doi.org/10.5281/zenodo.14191134)
 
 ## Beyond the Limit: The estimated air pollution damages of overshooting the temperature target
 
@@ -25,12 +25,12 @@ Outdoor air pollution causes millions of premature deaths, illnesses, and econom
 
 
 ## Code reference
-Available at Zenodo: [![DOI](https://zenodo.org/badge/681939290.svg)](https://zenodo.org/doi/10.5281/zenodo.10051008)
+Available at Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.14191134.svg)](https://doi.org/10.5281/zenodo.14191134)
 
 
 ## Data
-The global climate change mitigation scenario dataset analyzed in this study is available in Zenodo 
-[https://doi.org/10.5281/zenodo.5553976](https://doi.org/10.5281/zenodo.5553976)
+The global climate change mitigation scenario dataset analyzed in this study is available in Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5553976.svg)](https://doi.org/10.5281/zenodo.5553976)
+
 
 ## Reproduce the experiment
 To reproduce the results and figures shown in Rodés-Bachs et al.,
@@ -42,6 +42,5 @@ To reproduce the results and figures shown in Rodés-Bachs et al.,
 
 ## Funding acknowledgment
 
-<img src="./data/Flag_of_Europe.svg.png" width="80" height="54" align="left" alt="EU logo" />
-This project has received funding from the European Union’s Horizon 2020 research
-and innovation program under grant agreement No. 821471 (ENGAGE).
+<img src="./data/Flag_of_Europe.svg.png" width="126" height="85" align="left" alt="EU logo" />
+This work was funded by the European Union’s Horizon Europe research and innovation program under the ENGAGE - Exploring National and Global Actions to reduce Greenhouse gas Emissions - project (821471),  AdJUST - Advancing the understanding of challenges, policy options and measures to achieve a JUST EU energy transition - project (101069880), and the GRINS - Growing Resilient, INclusive and Sustainable - project (PE00000018).
