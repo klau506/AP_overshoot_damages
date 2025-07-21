@@ -106,20 +106,20 @@ doM_plot_bad_tails_prob = function(datIni,th,SI = TRUE,poll = 'PM25') {
   datall = do_rename_imp_fun_etal(datall, type = TRUE)
   if (SI) {
     datall$imp_fun_label = (factor(datall$imp_fun_label, levels = 
-                                     c('Cohen et al. (2005)\n(Rational)','Krewski et al. (2009)\n(LL)',
-                                       'Burnett et al. (2014)\n(IER)','GBD (low) (2015)\n(IER)','GBD (medium) (2015)\n(IER)',
-                                       'GBD (high) (2015)\n(IER)','Burnett et al.\n(with) (2018)\n(GEMM)',
-                                       'Burnett et al.\n(without) (2018)\n(GEMM)',
-                                       'Jerrett et al. (2009)\n(LL)','GBD (2015)\n(LL)')))
+                                     c('Cohen et al. (2005)\n(Rational) [51]','Krewski et al. (2009)\n(LL) [55]',
+                                       'Burnett et al. (2014)\n(IER) [50]','GBD (low) (2015)\n(IER) [56]','GBD (medium) (2015)\n(IER) [56]',
+                                       'GBD (high) (2015)\n(IER) [56]','Burnett et al.\n(with) (2018)\n(GEMM) [49]',
+                                       'Burnett et al.\n(without) (2018)\n(GEMM) [49]',
+                                       'Jerrett et al. (2009)\n(LL) [41]','GBD (2015)\n(LL) [56]')))
   } else if (poll == 'PM25') {
     datall$imp_fun_label = (factor(datall$imp_fun_label, levels = 
-                                         c('Cohen et al. (2005)\n(Rational)','Krewski et al. (2009)\n(LL)',
-                                           'Burnett et al. (2014)\n(IER)','GBD (low) (2015)\n(IER)','GBD (medium) (2015)\n(IER)',
-                                           'GBD (high) (2015)\n(IER)','Burnett et al.\n(with) (2018)\n(GEMM)',
-                                           'Burnett et al.\n(without) (2018)\n(GEMM)')))
+                                         c('Cohen et al. (2005)\n(Rational) [51]','Krewski et al. (2009)\n(LL) [55]',
+                                           'Burnett et al. (2014)\n(IER) [50]','GBD (low) (2015)\n(IER) [56]','GBD (medium) (2015)\n(IER) [56]',
+                                           'GBD (high) (2015)\n(IER) [56]','Burnett et al.\n(with) (2018)\n(GEMM) [49]',
+                                           'Burnett et al.\n(without) (2018)\n(GEMM) [49]')))
   } else {
     datall$imp_fun_label = (factor(datall$imp_fun_label, levels = 
-                                         c('Jerrett et al. (2009)\n(LL)','GBD (2015)\n(LL)')))
+                                         c('Jerrett et al. (2009)\n(LL) [41]','GBD (2015)\n(LL) [56]')))
   }
   
   datall$cb_group <- factor(datall$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))

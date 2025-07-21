@@ -2,8 +2,12 @@ dir.create(file.path('paper_figures/SI/uncert'), showWarnings = FALSE)
 source('si_uncert_functions.R')
 
 df_av = load_df_av()
-df_vsl = load_df_vsl()
-df_mort_raw = load_raw_df_mort() %>% as.data.table()
+df_vsl = load_df_vsl() %>% 
+  dplyr::filter(!impact_function_group %in% c('KREWSKI2009_gUNI','OSTRO2004_gUNI'))
+df_mort_raw = load_raw_df_mort() %>% as.data.table() %>% 
+  dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
+
+
 
 # Damage uncertainty
 dat1 = df_av[df_av$scenario != 'REF' & df_av$cb_group == '<1000',]
@@ -12,8 +16,8 @@ dat3 = df_mort_raw[df_mort_raw$scenario != 'REF' & df_mort_raw$cb_group == '<100
 
 dat_econ = merge(dat1, dat2) %>%
   dplyr::filter(pollutant == 'PM25' & year != 2020) %>%
-  dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
-  dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
+  # dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
+  # dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
   dplyr::rename('alpha_original' = 'alpha') %>%
   dplyr::mutate(alpha_original = factor(alpha_original, levels = c("hi", "med", "lo")))
 dat_econ = pivot_longer(dat_econ, cols = c('vsl_damage_avoided','hcl_damage_avoided','dong_damage_avoided','dech_damage_avoided',), names_to ='method',

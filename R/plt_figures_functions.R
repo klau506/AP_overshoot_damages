@@ -61,14 +61,14 @@ normalize_deaths = function(data, factor = 1e6) {
 load_df_pop = function() {
   assign('df_pop',
          get(load(file.path(data_path,'RDA/',outD,'pop_by_reg.RData'))) %>% 
-           select(-annualPop))
+           dplyr::select(-annualPop))
   # update year name
   df_pop <- df_pop %>% 
-    mutate(year = ifelse(t == 1, 2010,
+    dplyr::mutate(year = ifelse(t == 1, 2010,
                          ifelse(t == 2, 2020,
                                 ifelse(t == 3, 2030, 2050)))) %>% 
-    filter(year >= 2020) %>% 
-    select(-t)
+    dplyr::filter(year >= 2020) %>% 
+    dplyr::select(-t)
   # update region column names
   df_pop <- df_pop %>% 
     dplyr::rename(n = region) %>% 
@@ -93,7 +93,8 @@ load_df_pop = function() {
 #' 
 #' @return dong and dechezlepretre avoided damages (dong and dechezlepretre avoided damages) dataframe for all R10 regions and WORLD
 load_df_av = function() {
-  load(file.path(data_path,'RDA/',outD,'df_pol.RData'))
+  # load(file.path(data_path,'RDA/',outD,'df_pol_wrongMay2025.RData'))
+  load(file.path(data_path,'RDA/',outD,'df_pol2.RData'))
 
   # add WORLD as a region in df_pol
   df_pol.world <- df_pol %>%
@@ -124,16 +125,20 @@ load_df_av = function() {
 #' @return vsl damages (vsl absolute and avoided damage) dataframe for all R10 regions and WORLD
 load_df_vsl = function() {
   load(file.path(data_path,'RDA/',outD,'df_vsl.RData'))
-  load(file.path(data_path,'FromZeus/RDA',outD,'hcl_gdp_damage_avoided.RData'))
-  df_hc = hcl_gdp_damage_avoided %>%
+  df_vsl <- df_vsl %>% 
+    dplyr::rename(vsl_damage_avoided = vsl_damage_absolute)
+  # load(file.path(data_path,'FromZeus/RDA',outD,'hcl_gdp_damage_avoided.RData'))
+  # df_hc = hcl_gdp_damage_avoided %>%
+  
+  load(file.path(data_path,'RDA',outD,'df_hcl.RData'))
+  df_hc = df_hcl %>%
     dplyr::filter(pollutant == 'PM25') %>%
-    dplyr::mutate(across('model', \(x) str_replace(x, 'REMIND-MAgPIE_2_1-4_2', 'REMIND.MAgPIE_2_1.4_2'))) %>%
-    dplyr::mutate(across('model', \(x) str_replace(x, 'MESSAGEix-GLOBIOM_1_1', 'MESSAGEix.GLOBIOM_1_1'))) %>%
-    dplyr::mutate(across('model', \(x) str_replace(x, 'POLES-JRC_ENGAGE', 'POLES.JRC_ENGAGE'))) %>%
-    dplyr::rename('hcl_damage_avoided' = 'value')
+    dplyr::rename('hcl_damage_avoided' = 'hcl_gdp_damage_avoided')
+    # dplyr::rename('hcl_damage_avoided' = 'hcl_gdp_damage_avoided')
   df_vsl = merge(df_vsl, df_hc, by = c('region','year','model','cb_group','carbon_budget','scenario','policy','impact_function_global_level','n',
-                                       'impact_function','parameter','cf','group','pollutant','alpha')) %>%
-    dplyr::select(-c(vsl_damage_absolute))
+                                       'impact_function','parameter','cf','group','pollutant','alpha')) 
+  # %>%
+  #   dplyr::select(-c(vsl_damage_absolute))
   
   # add WORLD as a region in df_vsl
   df_vsl.world <- df_vsl %>% 
@@ -165,7 +170,7 @@ load_df_vsl = function() {
 
 load_raw_df_mort = function() {
   namesr10 = fread(paste(data_path,'WITCH','r10namesrelation.csv',sep='/'))
-  assign('df_mort', get(load(file.path('../Data/mort_imp_fun_v24_new.RData'))))
+  assign('df_mort', get(load(file.path('../../../Analysis/TFM_analysis/Data/mort_imp_fun_v24_new.RData'))))
   rm(datMort)
   df_mort = data.table(df_mort)
   setnames(df_mort, 't', 'year')
@@ -185,7 +190,7 @@ load_raw_df_mort = function() {
 
 load_raw_df_w_mort = function() {
   namesr10 = fread(paste(data_path,'WITCH','r10namesrelation.csv',sep='/'))
-  assign('df_mort', get(load(file.path('../Data/mort_imp_fun_v24_new.RData'))))
+  assign('df_mort', get(load(file.path('../../../Analysis/TFM_analysis/Data/mort_imp_fun_v24_new.RData'))))
   rm(datMort)
   df_mort = data.table(df_mort)
   setnames(df_mort, 't', 'year')
@@ -219,7 +224,7 @@ load_raw_df_w_mort = function() {
 #' @return premature mortality due to AP dataframe for all R10 regions and WORLD
 load_df_mort = function() {
   namesr10 = fread(paste(data_path,'WITCH','r10namesrelation.csv',sep='/'))
-  assign('df_mort', get(load(file.path('../Data/mort_imp_fun_v24_new.RData'))))
+  assign('df_mort', get(load(file.path('../../../Analysis/TFM_analysis/Data/mort_imp_fun_v24_new.RData'))))
   rm(datMort)
   df_mort = data.table(df_mort)
   setnames(df_mort, 't', 'year')
@@ -264,7 +269,7 @@ load_df_mort = function() {
 #' @return premature mortality due to AP dataframe for all R10 regions and WORLD
 load_df_conc = function() {
   namesr10 = fread(paste(data_path,'WITCH','r10namesrelation.csv',sep='/'))
-  assign('df_conc', get(load(file.path('../Data/conc_fasstr_v24_allyears.RData'))))
+  assign('df_conc', get(load(file.path('/media/klaudia/easystore/MAMME/TFM/Analysis/TFM_analysis/Data/conc_fasstr_v24_allyears.RData'))))
   rm(datConc)
   df_conc = data.table(df_conc)
   df_conc$t = ifelse(df_conc$year == 2020, 1,
@@ -295,7 +300,7 @@ load_df_conc = function() {
   namesr10 = dplyr::bind_rows(namesr10, data.frame('fullname' = 'World', 
                                                    'region' = 'WORLD', 
                                                    'nn' = 11))
-  assign('df_conc', get(load(file.path('../Data/conc_fasstr_v30_allyears.RData'))))
+  assign('df_conc', get(load(file.path('../../../Analysis/TFM_analysis/Data/conc_fasstr_v30_allyears.RData'))))
   rm(datConc)
   df_conc = data.table(df_conc)
   df_conc = merge(df_conc, namesr10[, c('region','nn')], by = 'region')
@@ -405,7 +410,7 @@ map_plot = function(df, save, what, y, facet_title){
                           breaks = c(0,floor(maxVal/2),maxVal)
                           # breaks = c(floor(min(world1$value)),floor(median(world1$value)),floor(max(world1$value)))
       )+
-      facet_wrap(impact_function ~ ., ncol = 5,
+      facet_wrap(impact_function ~ ., ncol = 4,
                  labeller = labeller(impact_function = impact_function_group.labs, ci_z_level = ci_z_level.labs)) +
       theme(legend.key.size = unit(1.5, 'cm'), legend.key.height = unit(3,'cm'),
             strip.text.y = element_text(size = 12,angle = 90),strip.text.x = element_text(size = 12),
@@ -811,8 +816,8 @@ cum_fun_econ = function(df, y, remove_xfacet, reg) {
   # plot
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = scenario, fill = scenario, linetype = alpha)) +
     geom_line(linewidth = 0.8, alpha=0.8) +
-    ggh4x::facet_grid2(. ~ method, 
-                       labeller = labeller(method = method_av.labs)) +
+    facet_wrap(. ~ method, scales = 'free_y', nrow = 1,
+               labeller = labeller(method = method_av.labs)) +
     ggpubr::theme_pubr() +
     scale_color_manual(values = scenario.colors,
                        name = 'Policy design',
@@ -917,27 +922,32 @@ m_sensitivity_plot = function(datIni,reg,poll) {
                   mmax  = max(value),
                   mmin  = min(value),
                   mmean  = mean(value)),
-                by = c('year','region','cb_group',
-                       'scenario', 'ci_level', 'z_level')]
+                by = c('year','region','cb_group','impact_function_group',
+                       'scenario', 'ci_level', 'z_level')] %>% 
+    do_rename_imp_fun_etal()
   
-  dat[ci_level == "ciLO", ci_label := "5th %CI"]
-  dat[ci_level == "ciMED", ci_label := "50th %CI"]
-  dat[ci_level == "ciHI", ci_label := "95th %CI"]
-  dat[, ci_level := factor(ci_label, levels = c("5th %CI", "50th %CI", "95th %CI"))]
+  dat[ci_level == "ciLO", ci_label := "2.5th"]
+  dat[ci_level == "ciMED", ci_label := "50th"]
+  dat[ci_level == "ciHI", ci_label := "97.5th"]
+  dat[, ci_level := factor(ci_label, levels = c("2.5th", "50th", "97.5th"))]
 
-  dat[z_level == "zLO", z_label := '5th %CI']
-  dat[z_level == "zMED", z_label := '50th %CI']
-  dat[z_level == "zHI", z_label := '95th %CI']
+  dat[z_level == "zLO", z_label := '2.5th']
+  dat[z_level == "zMED", z_label := '50th']
+  dat[z_level == "zHI", z_label := '97.5th']
   dat[z_level == "zUNI", z_label := 'No ZCF\nuncertainty']
-  dat[, z_level := factor(z_label, levels = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty'))]
+  dat[, z_level := factor(z_label, levels = c('2.5th','50th','97.5th','No ZCF\nuncertainty'))]
 
   dat$cb_group <- factor(dat$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))
-  dat$z_level <- fct_rev(factor(dat$z_level, levels = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty')))
-  
+  dat$z_level <- fct_rev(factor(dat$z_level, levels = c('2.5th','50th','97.5th','No ZCF\nuncertainty')))
+  dat$imp_fun_label <- fct_rev(factor(dat$imp_fun_label, levels = c("Cohen et al. (2005) [51]", "Krewski et al. (2009) [55]", "Burnett et al. (2014) [50]",
+                                                                    "GBD (low) (2015) [56]", "GBD (medium) (2015) [56]","GBD (high) (2015) [56]", 
+                                                                    "Burnett et al.\n(with) (2018) [49]", "Burnett et al.\n(without) (2018) [49]")
+  ))
+
   pl <- ggplot(dat) +
     geom_errorbar(aes(xmin = c05,
                       xmax = c95,
-                      y = z_level,
+                      y = imp_fun_label,
                       group = interaction(scenario,ci_level,z_level),
                       color = ci_level,
                       linetype = z_level),
@@ -945,13 +955,13 @@ m_sensitivity_plot = function(datIni,reg,poll) {
                   width = 0.33,
                   position = position_dodge(width = 0.5)) +
     geom_point(aes(x = cmed,
-                   y = z_level,
+                   y = imp_fun_label,
                    group = interaction(scenario,ci_level,z_level),
                    shape = scenario),
                position = position_dodge(width = 0.5),
                size = 2.5) +
     geom_point(aes(x = cmed,
-                   y = z_level,
+                   y = imp_fun_label,
                    group = interaction(scenario,ci_level,z_level),
                    color = ci_level,
                    shape = scenario),
@@ -963,7 +973,7 @@ m_sensitivity_plot = function(datIni,reg,poll) {
           axis.text.y.left = element_text(size = 12),
           axis.text.x.bottom = element_text(size = 10)) +
     scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +    scale_shape_manual(values = c(16,17),
-                       name = 'Policy design')+
+                       name = 'Policy design') +
     scale_color_brewer(palette = "Set1",
                        name = 'Parameter\npercentile') +
     scale_linetype_manual(values = shortpal_linetype,
@@ -1007,23 +1017,19 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
   dat = do_rename_meth_etal(dat)
   dat$meth_label = fct_rev(dat$meth_label)
 
-  dat[impact_function_group == "BRUNETT2018_gWITH", imp_fun_label := "Brunett et al.\n(with) (2018)"]
-  dat[impact_function_group == "BRUNETT2018_gOUT", imp_fun_label := "Brunett et al.\n(without) (2018)"]
-  dat[impact_function_group == "BURNETT2014_gUNI", imp_fun_label := "Burnett et al. (2014)"]
-  dat[impact_function_group == "GBD2016_gLO", imp_fun_label := "GBD (low) (2016)"]
-  dat[impact_function_group == "GBD2016_gMED", imp_fun_label := "GBD (medium) (2016)"]
-  dat[impact_function_group == "GBD2016_gHI", imp_fun_label := "GBD (high) (2016)"]
-  dat[impact_function_group == "KREWSKI2009_gUNI", imp_fun_label := "Krewski et al. (2009)"]
-  dat[impact_function_group == "OSTRO2004_gUNI", imp_fun_label := "Cohen et al. (2005)"]
+  dat[impact_function_group == "BRUNETT2018_gWITH", imp_fun_label := "Brunett et al.\n(with) (2018) [49]"]
+  dat[impact_function_group == "BRUNETT2018_gOUT", imp_fun_label := "Brunett et al.\n(without) (2018) [49]"]
+  dat[impact_function_group == "BURNETT2014_gUNI", imp_fun_label := "Burnett et al. (2014) [50]"]
+  dat[impact_function_group == "GBD2016_gLO", imp_fun_label := "GBD (low) (2016) [56]"]
+  dat[impact_function_group == "GBD2016_gMED", imp_fun_label := "GBD (medium) (2016) [56]"]
+  dat[impact_function_group == "GBD2016_gHI", imp_fun_label := "GBD (high) (2016) [56]"]
   dat[impact_function_group == "Zero rr fun used", imp_fun_label := "No RR function\nused"]
-  dat[, impact_function_group := factor(imp_fun_label, levels = c("Brunett et al.\n(with) (2018)",
-                                                                  "Brunett et al.\n(without) (2018)",
-                                                                  "Burnett et al. (2014)",
-                                                                  "GBD (low) (2016)",
-                                                                  "GBD (medium) (2016)",
-                                                                  "GBD (high) (2016)",
-                                                                  "Krewski et al. (2009)",
-                                                                  "Cohen et al. (2005)",
+  dat[, impact_function_group := factor(imp_fun_label, levels = c("Brunett et al.\n(with) (2018) [49]",
+                                                                  "Brunett et al.\n(without) (2018) [49]",
+                                                                  "Burnett et al. (2014) [50]",
+                                                                  "GBD (low) (2016) [56]",
+                                                                  "GBD (medium) (2016) [56]",
+                                                                  "GBD (high) (2016) [56]",
                                                                   "No RR function\nused"
                                                                   ))]
   
@@ -1036,29 +1042,30 @@ econ_sensitivity_plot = function(datIni,reg,poll) {
                       color = impact_function_group),
                   linewidth = 1,
                   width = 0.33,
-                  position = position_dodge(width = 0.75)) +
+                  position = position_dodge(width = 0.9)) +
     geom_point(aes(x = cmed,
                    y = meth_label,
                    group = interaction(scenario,alpha,impact_function_group),
                    shape = scenario),
-               position = position_dodge(width = 0.75),
+               position = position_dodge(width = 0.9),
                size = 2.5) +
     geom_point(aes(x = cmed,
                    y = meth_label,
                    group = interaction(scenario,alpha,impact_function_group),
                    color = impact_function_group,
                    shape = scenario),
-               position = position_dodge(width = 0.75),
+               position = position_dodge(width = 0.9),
                size = 1.5) +
     theme_light() +
     theme(panel.grid.major.x = element_blank(),
           panel.grid.minor.y = element_blank(),
-          axis.text.y.left = element_text(size = 12),
-          axis.text.x.bottom = element_text(size = 10)) +
+          axis.text.y.left = element_text(size = 14),
+          axis.text.x.bottom = element_text(size = 10),
+          legend.title = element_text(size=12), legend.text = element_text(size=12)) +
     scale_x_continuous(labels = scales::comma) +
     scale_shape_manual(values = c(16,17),
                        name = 'Policy design')+
-    scale_color_brewer(palette = "Set1",
+    scale_color_manual(values = set1,
                        name = 'RR function') +
     scale_linetype_manual(values = c('low' = 'dotted', 'medium' = 'solid', 'high' = 'dashed'),
                           name = 'Elasticity') +

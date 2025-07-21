@@ -321,28 +321,28 @@ doM_zcf_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
                 by = c('t','Regions','impact_function_group','cb_group',
                        'scen','ci_level','z_level')]
   
-  dat[ci_level == "ciLO", ci_label := "5th"]
-  dat[ci_level == "ciMED", ci_label := "median"]
-  dat[ci_level == "ciHI", ci_label := "95th"]
-  dat[, ci_level := factor(ci_label, levels = c("5th",
-                                                "median",
-                                                "95th"))]
-  dat[z_level == "zLO", z_label := '5th']
-  dat[z_level == "zMED", z_label := 'median']
-  dat[z_level == "zHI", z_label := '95th']
+  dat[ci_level == "ciLO", ci_label := "2.5th"]
+  dat[ci_level == "ciMED", ci_label := "50th"]
+  dat[ci_level == "ciHI", ci_label := "97.5th"]
+  dat[, ci_level := factor(ci_label, levels = c("2.5th",
+                                                "50th",
+                                                "97.5th"))]
+  dat[z_level == "zLO", z_label := '2.5th']
+  dat[z_level == "zMED", z_label := '50th']
+  dat[z_level == "zHI", z_label := '97.5th']
   dat[z_level == "zUNI", z_label := 'No ZCF\nuncertainty']
-  dat[, z_level := factor(z_label, levels = c('5th','median','95th','No ZCF\nuncertainty'))]
+  dat[, z_level := factor(z_label, levels = c('2.5th','50th','97.5th','No ZCF\nuncertainty'))]
   
   dat = do_rename_imp_fun_etal(dat)
   if (poll == 'PM25') {
     dat$imp_fun_label = fct_rev(factor(dat$imp_fun_label, levels = 
-                                         c('Cohen et al. (2005)','Krewski et al. (2009)',
-                                           'Burnett et al. (2014)','GBD (low) (2015)','GBD (medium) (2015)',
-                                           'GBD (high) (2015)','Burnett et al.\n(with) (2018)',
-                                           'Burnett et al.\n(without) (2018)')))
+                                         c("Cohen et al. (2005) [51]", "Krewski et al. (2009) [55]",
+                                           "Burnett et al. (2014) [50]",  "GBD (low) (2015) [56]", 
+                                           "GBD (medium) (2015) [56]","GBD (high) (2015) [56]", 
+                                           "Burnett et al.\n(with) (2018) [49]", "Burnett et al.\n(without) (2018) [49]")))
   } else {
     dat$imp_fun_label = fct_rev(factor(dat$imp_fun_label, levels = 
-                                         c('Jerrett et al. (2009)','GBD (2015)')))
+                                         c('Jerrett et al. (2009) [41]','GBD (2015) [56]')))
   }
   dat$cb_group <- factor(dat$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))
   
@@ -414,7 +414,7 @@ doM_zcf_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy,save) {
 }
 
 # by region and poll
-doM_FIGURE_ZCF_CI_sens_by_regio_pollutant = function(dat) {
+doM_FIGURE_ZCF_CI_sens_by_region_pollutant = function(dat) {
   for (reg in unique(dat$Regions)) {
     for (poll in unique(dat$pollutant)) {
       # restric to NZ and EoC

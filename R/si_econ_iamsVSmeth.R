@@ -29,7 +29,7 @@ do_iams_plot = function(datIni, save) {
           panel.ontop = FALSE, legend.position = "bottom", strip.text = element_text(color = "black"),
           strip.text.y = element_text(size = 13, angle = 0, hjust = 0), panel.grid.minor = element_blank(),
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
-          axis.text = element_text(size = 10),
+          axis.text = element_text(size = 12),
           strip.background = element_rect(fill = 'white', color = 'white')) +
     scale_x_continuous(labels = scales::comma) +
     scale_fill_manual(values = scenario.colors,
@@ -64,7 +64,7 @@ do_meth_plot = function(datIni, save) {
           panel.ontop = FALSE, legend.position = "bottom", strip.text = element_text(color = "black"),
           strip.text.y = element_text(size = 13, angle = 0, hjust = 0), panel.grid.minor = element_blank(),
           panel.grid.major.y = element_blank(), plot.background = element_rect(fill = 'white'), 
-          axis.text = element_text(size = 10),
+          axis.text = element_text(size = 12),
           strip.background = element_rect(fill = 'white', color = 'white')) +
     scale_x_continuous(labels = scales::comma) +
     scale_fill_manual(values = scenario.colors,
@@ -107,7 +107,7 @@ doEcon_iams_meth = function(datIni, legend = TRUE) {
   print(ci_medi_meth_quantiles)
   
   
-  for (cb in unique(dat_to_plot$cb_group)) {
+  for (cb in unique(as.character(dat_to_plot$cb_group))) {
     pl_meth <<- do_meth_plot(dat_to_plot %>% filter(cb_group == cb), save = TRUE)
     pl_iams <<- do_iams_plot(dat_to_plot %>% filter(cb_group == cb), save = TRUE)
     

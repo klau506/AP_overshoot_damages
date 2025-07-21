@@ -27,8 +27,8 @@
 doEcon_gsa = function(datIni) {
   
   data = datIni %>%
-    mutate(impact_function = unlist(str_extract_all(impact_function_global_level,"(?<=PM25MORT_).+(?=_ci)"))) %>%
-    select(year,policy,carbon_budget,model,cb_group,region,
+    dplyr::mutate(impact_function = unlist(str_extract_all(impact_function_global_level,"(?<=PM25MORT_).+(?=_ci)"))) %>%
+    dplyr::select(year,policy,carbon_budget,model,cb_group,region,
            impact_function,parameter,cf,method,scenario,alpha,
            value)
   N = length(data$value)
@@ -80,7 +80,7 @@ doEcon_gsa = function(datIni) {
     }
   }
   sd_calc = sd_calc %>%
-    mutate(item = factor(item, levels=c('model','method','alpha','rr function','parameter','cf')),
+    dplyr::mutate(item = factor(item, levels=c('model','method','alpha','rr function','parameter','cf')),
            cb_group = factor(cb_group, levels = c("<1000", "[1000,2000]", ">2000")))
   
   pl = ggplot(sd_calc, aes(x = item, y = sd_50)) +

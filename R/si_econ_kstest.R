@@ -78,7 +78,7 @@ doEcon_ks_comp_plot = function(ks_all, slides = FALSE) {
   name = dplyr::if_else(!slides, 'Results/Econ/ks_test/ks_test_econ',
                         'Results/Slides/ks_test_econ')
   print(name)
-  w = dplyr::if_else(!slides, 400, 300)
+  w = dplyr::if_else(!slides, 400, 250)
   ggsave(file=paste0(name,'.png'), width = w, height = 180, units = "mm",plot = pl_all, limitsize = FALSE)
   ggsave(file=paste0(name,'.pdf'), width = w, height = 180, units = "mm",plot = pl_all, limitsize = FALSE)
   return(pl_all)

@@ -17,7 +17,7 @@ library(ggsci)
 library(cowplot)
 
 data_path = '../fasstr_data'
-outD = 'econ'
+outD = 'econ3'
 source('zzz.R')
 source('plt_figures_functions.R')
 source('plt_figures_kstest.R')
@@ -30,10 +30,14 @@ GDP_incr = 1.182807
 
 ## load the dfs
 df_av = load_df_av()
-df_vsl = load_df_vsl()
-df_mort = load_df_mort()
-df_mort_raw = load_raw_df_mort()
-df_mort_w_raw = load_raw_df_w_mort()
+df_vsl = load_df_vsl() %>% 
+  dplyr::filter(!impact_function_group %in% c('KREWSKI2009_gUNI','OSTRO2004_gUNI'))
+df_mort = load_df_mort() %>% 
+  dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
+df_mort_raw = load_raw_df_mort() %>% 
+  dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
+df_mort_w_raw = load_raw_df_w_mort() %>% 
+  dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
 df_pop = load_df_pop()
 
 ################################################################################
@@ -60,8 +64,8 @@ ks_plt = ks_plt +
 ## -- prob distrib & cumulative functions
 datt = data.table(df_mort)[df_mort$scenario != 'REF',] %>%
   dplyr::mutate(impact_function_group = factor(impact_function_group,
-                                               levels = c("PM25MORT_OSTRO2004_UNI", "PM25MORT_KREWSKI2009_UNI", "PM25MORT_BURNETT2014_UNI", "PM25MORT_GBD2016_LO", "O3MORT_JERRET2009_UNI",
-                                                          "PM25MORT_GBD2016_MED", "PM25MORT_GBD2016_HI", "PM25MORT_BRUNETT2018_WITH", "PM25MORT_BRUNETT2018_OUT", "O3MORT_GBD2015_UNI")))
+                                               levels = c("PM25MORT_BURNETT2014_UNI", "PM25MORT_GBD2016_LO", "PM25MORT_GBD2016_MED", "O3MORT_JERRET2009_UNI",
+                                                          "PM25MORT_GBD2016_HI", "PM25MORT_BRUNETT2018_WITH", "PM25MORT_BRUNETT2018_OUT", "O3MORT_GBD2015_UNI")))
 # consider only EoC-NZ cb pairs
 datt = keep_only_scen_paired(datt) %>%
   as.data.table()
@@ -89,28 +93,26 @@ dattdiff = pivot_wider(dattdiff, names_from = c(scenario, impact_function_group)
   dplyr::mutate(O3MORT_GBD2015_UNI        = EoC_O3MORT_GBD2015_UNI        - NZ_O3MORT_GBD2015_UNI) %>%
   dplyr::mutate(O3MORT_JERRET2009_UNI     = EoC_O3MORT_JERRET2009_UNI     - NZ_O3MORT_JERRET2009_UNI) %>%
   dplyr::mutate(PM25MORT_BURNETT2014_UNI  = EoC_PM25MORT_BURNETT2014_UNI  - NZ_PM25MORT_BURNETT2014_UNI) %>%
-  dplyr::mutate(PM25MORT_KREWSKI2009_UNI  = EoC_PM25MORT_KREWSKI2009_UNI  - NZ_PM25MORT_KREWSKI2009_UNI) %>%
-  dplyr::mutate(PM25MORT_OSTRO2004_UNI    = EoC_PM25MORT_OSTRO2004_UNI    - NZ_PM25MORT_OSTRO2004_UNI) %>%
   dplyr::mutate(PM25MORT_BRUNETT2018_OUT  = EoC_PM25MORT_BRUNETT2018_OUT  - NZ_PM25MORT_BRUNETT2018_OUT) %>%
   dplyr::mutate(PM25MORT_BRUNETT2018_WITH = EoC_PM25MORT_BRUNETT2018_WITH - NZ_PM25MORT_BRUNETT2018_WITH) %>%
   dplyr::select(year,ci_z_level,cb_group,region,n,
                 PM25MORT_GBD2016_HI,PM25MORT_GBD2016_LO,PM25MORT_GBD2016_MED,O3MORT_GBD2015_UNI,O3MORT_JERRET2009_UNI,
-                PM25MORT_BURNETT2014_UNI,PM25MORT_KREWSKI2009_UNI,PM25MORT_OSTRO2004_UNI,PM25MORT_BRUNETT2018_OUT,PM25MORT_BRUNETT2018_WITH) %>%
+                PM25MORT_BURNETT2014_UNI,PM25MORT_BRUNETT2018_OUT,PM25MORT_BRUNETT2018_WITH) %>%
   dplyr::distinct(., .keep_all = FALSE)
 
 dattdiff = pivot_longer(dattdiff, cols = c(PM25MORT_GBD2016_HI,PM25MORT_GBD2016_LO,PM25MORT_GBD2016_MED,O3MORT_GBD2015_UNI,O3MORT_JERRET2009_UNI,
-                                           PM25MORT_BURNETT2014_UNI,PM25MORT_KREWSKI2009_UNI,PM25MORT_OSTRO2004_UNI,PM25MORT_BRUNETT2018_OUT,PM25MORT_BRUNETT2018_WITH),
+                                           PM25MORT_BURNETT2014_UNI,PM25MORT_BRUNETT2018_OUT,PM25MORT_BRUNETT2018_WITH),
                         names_to = 'impact_function', values_to = 'value') %>%
   dplyr::mutate(impact_function = factor(impact_function,
-                                         levels = c("PM25MORT_OSTRO2004_UNI", "PM25MORT_KREWSKI2009_UNI", "PM25MORT_BURNETT2014_UNI", "PM25MORT_GBD2016_LO", "O3MORT_JERRET2009_UNI",
-                                                    "PM25MORT_GBD2016_MED", "PM25MORT_GBD2016_HI", "PM25MORT_BRUNETT2018_WITH", "PM25MORT_BRUNETT2018_OUT", "O3MORT_GBD2015_UNI")))
+                                         levels = c("PM25MORT_BURNETT2014_UNI", "PM25MORT_GBD2016_LO", "PM25MORT_GBD2016_MED", "O3MORT_JERRET2009_UNI",
+                                                    "PM25MORT_GBD2016_HI", "PM25MORT_BRUNETT2018_WITH", "PM25MORT_BRUNETT2018_OUT", "O3MORT_GBD2015_UNI")))
 # Consider only median discount rate and 2030
 dattdiff = dattdiff |> filter(ci_z_level == '50th', cb_group == '<1000')
 y = 2030
 
 m_pl = map_plot(normalize_deaths(dattdiff, 1e5),save = FALSE,'av_mort_diff',y) 
-# ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.png'), width = 300, height = 100, units = 'mm', plot = m_pl)
-ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', plot = m_pl)
+# ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.png'), width = 300, height = 100, units = 'mm', dpi = 400, plot = m_pl)
+ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', dpi = 400, plot = m_pl)
 
 ## whole figure
 # vertical line to separate PM25 and O3 graphs
@@ -122,15 +124,18 @@ pl_vline = ggplot() +
 
 # without title
 pl = ggdraw() +
-  draw_plot(m_pl, x = 0.01, y = 0.65, width = 0.9, height = 0.35) +
-  draw_plot(pl_vline, x = 0.235, y = 0.675, width = 1, height = 0.3) +
-  draw_plot(dmd, x = 0.01, y = 0.34, width = 0.9, height = 0.35) +
-  draw_plot(pl_vline, x = 0.2225, y = 0.4, width = 1, height = 0.26) +
-  draw_plot(cmd, x = 0.01, y = 0, width = 0.9, height = 0.35) +
-  draw_plot(pl_vline, x = 0.235, y = 0.105, width = 1, height = 0.22) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0), y = c(0.98, 0.68, 0.34))
-ggsave(file=file.path(paste0('paper_figures/fig1/extended_heatlh_cobenefits_notitle_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 337.5, unit = 'mm')
+  draw_plot(m_pl, x = 0.01, y = 0.665, width = 0.9, height = 0.34) +
+  draw_plot(pl_vline, x = 0.195, y = 0.715, width = 1, height = 0.25) +
+  draw_plot(dmd, x = 0.01, y = 0.32, width = 0.9, height = 0.34) +
+  draw_plot(pl_vline, x = 0.17755, y = 0.365, width = 1, height = 0.27) +
+  draw_plot(cmd, x = 0.01, y = -0.01, width = 0.9, height = 0.34) +
+  draw_plot(pl_vline, x = 0.195, y = 0.0875, width = 1, height = 0.22) +
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
+                  x = c(0, 0, 0), y = c(1, 0.66, 0.32)) +
+  draw_plot_label(label = c("   "), size = 23,
+                  x = -0.3150, y = 1) +
+  theme(plot.background = element_rect(fill = 'white', color = 'white'))
+ggsave(file=file.path(paste0('paper_figures/fig1/extended_heatlh_cobenefits_notitle_',paste(y, collapse = '-'),'.png')), plot = pl, width = 400, height = 337.5, unit = 'mm', dpi = 400)
 
 # with title
 pl = ggdraw() +
@@ -140,15 +145,15 @@ pl = ggdraw() +
   draw_plot(pl_vline, x = 0.2225, y = 0.365, width = 1, height = 0.27) +
   draw_plot(cmd, x = 0.01, y = -0.01, width = 0.9, height = 0.34) +
   draw_plot(pl_vline, x = 0.235, y = 0.0875, width = 1, height = 0.22) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
                   x = c(0, 0, 0), y = c(0.95, 0.66, 0.32)) +
   draw_plot_label(label = c("Extended Figure: Global health co-benefits of reduced overshoot"), size = 23,
                   x = -0.3150, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig1/extended_heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 375, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig1/extended_heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 375, unit = 'mm', dpi = 400)
 
 # K-S figure for SI
 dir.create(file.path('paper_figures/SI/ks'), showWarnings = FALSE)
-ggsave(file=file.path(paste0('paper_figures/SI/ks/ks_mort_2030_2050.pdf')), plot = ks_plt, width = 400, height = 225, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/SI/ks/ks_mort_2030_2050.pdf')), plot = ks_plt, width = 400, height = 225, unit = 'mm', dpi = 400)
 
 ### == main fig1
 dmd_main = prob_distrib_mort_main(datt[datt$cb_group == '<1000' & datt$region == 11,],2030,remove_xfacet = FALSE,reg = 'WORLD',legend=TRUE)
@@ -187,7 +192,7 @@ dattdiff = datt %>%
 m_pl_main = map_plot(normalize_deaths(dattdiff, 1e5) %>%
                   filter(cb_group == '<1000', year == 2030),save = FALSE,'av_mort_diff_main',y) +
   theme(strip.text = element_text(face = "bold", size = 12))
-ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_main_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', plot = m_pl_main)
+ggsave(file=paste0('paper_figures/fig1/map_av_mort_diff_main_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', dpi = 400, plot = m_pl_main)
 
 
 # without title
@@ -196,15 +201,18 @@ legend = ggpubr::get_legend(cmd_main +
                               theme(legend.direction = 'vertical'))
 
 pl = ggdraw() +
-  draw_plot(m_pl_main, x = 0.01, y = 0.46, width = 0.95, height = 0.6) +
+  draw_plot(m_pl_main, x = 0.01, y = 0.42, width = 0.95, height = 0.6) +
   draw_plot(dmd_main + 
-              theme(legend.position = 'none'), x = 0.02, y = 0.11, width = 0.35, height = 0.4) +
+              theme(legend.position = 'none'), x = 0.02, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cmd_main + 
-              theme(legend.position = 'none'), x = 0.59, y = 0.11, width = 0.35, height = 0.4) +
-  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.15, width = 1, height = 1) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0.56), y = c(0.98, 0.53, 0.53))
-ggsave(file=file.path(paste0('paper_figures/fig1/heatlh_cobenefits_notitle_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
+              theme(legend.position = 'none'), x = 0.59, y = 0.07, width = 0.35, height = 0.4) +
+  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
+                  x = c(0, 0, 0.56), y = c(0.94, 0.5, 0.5)) +
+  draw_plot_label(label = c(""), size = 19,
+                  x = -0.190, y = 1) +
+  theme(plot.background = element_rect(fill = 'white', color = 'white'))
+ggsave(file=file.path(paste0('paper_figures/fig1/heatlh_cobenefits_notitle_',paste(y, collapse = '-'),'.png')), plot = pl, width = 400, height = 200, unit = 'mm', dpi = 350)
 
 
 # with title
@@ -215,11 +223,11 @@ pl = ggdraw() +
   draw_plot(cmd_main + 
               theme(legend.position = 'none'), x = 0.59, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
                   x = c(0, 0, 0.56), y = c(0.94, 0.5, 0.5)) +
   draw_plot_label(label = c("Global health co-benefits of reduced overshoot"), size = 19,
                   x = -0.190, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig1/heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig1/heatlh_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm', dpi = 300)
 
 
 
@@ -260,21 +268,23 @@ legend = ggpubr::get_legend(pl_sens_china)
 # without title
 pl = ggdraw() +
   draw_plot(pl_sens_northam +
-              theme(legend.position = 'none'), x = 0.01, y = 0.56, width = 0.4, height = 0.42) +
+              theme(legend.position = 'none'), x = 0.01, y = 0.54, width = 0.4, height = 0.41) +
   draw_plot(pl_sens_china +
               theme(legend.position = 'none') +
-              labs(y = ''), x = 0.5, y = 0.56, width = 0.4, height = 0.42) +
-  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = 0.27, width = 1, height = 1) +
+              labs(y = ''), x = 0.5, y = 0.54, width = 0.4, height = 0.41) +
+  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = 0.24, width = 1, height = 1) +
   draw_plot(pl_iams + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none',
                                                axis.text.x = element_text(size = 10)),
-            x = 0.01, y = 0, width = 0.45, height = 0.57) +
-  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(),
+            x = 0.01, y = 0, width = 0.45, height = 0.55) +
+  draw_plot(pl_impfun + labs(title = '') + theme(strip.text.x = element_blank(), 
                                                  legend.position = 'none',
                                                  axis.text.x = element_text(size = 10)),
-            x = 0.5325, y = 0, width = 0.45, height = 0.57) +
-  draw_plot_label(label = c("a1", "a2", "b1", "b2"), size = 15,
-                  x = c(0, 0.5, 0, 0.5), y = c(0.98, 0.98, 0.57, 0.57))
-ggsave(file=file.path(paste0('paper_figures/fig2/heatlh_uncertainty_notitle_2030.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
+            x = 0.5325, y = 0, width = 0.45, height = 0.55) +
+  draw_plot_label(label = c("A", "B", "C", "D"), size = 15,
+                  x = c(0, 0.5, 0, 0.5), y = c(0.95, 0.95, 0.55, 0.55)) +
+  draw_plot_label(label = c(""), size = 1,
+                  x = -0.122, y = 1)
+ggsave(file=file.path(paste0('paper_figures/fig2/heatlh_uncertainty_notitle_2030.pdf')), plot = pl, width = 420, height = 250, unit = 'mm', dpi = 400)
 
 # with title
 pl = ggdraw() +
@@ -291,11 +301,11 @@ pl = ggdraw() +
                                                  legend.position = 'none',
                                                  axis.text.x = element_text(size = 10)),
             x = 0.5325, y = 0, width = 0.45, height = 0.55) +
-  draw_plot_label(label = c("a1", "a2", "b1", "b2"), size = 15,
+  draw_plot_label(label = c("A", "B", "C", "D"), size = 15,
                   x = c(0, 0.5, 0, 0.5), y = c(0.95, 0.95, 0.55, 0.55)) +
   draw_plot_label(label = c("Health co-benefits uncertainty"), size = 20,
                   x = -0.122, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig2/heatlh_uncertainty_2030.pdf')), plot = pl, width = 420, height = 200, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig2/heatlh_uncertainty_2030.pdf')), plot = pl, width = 420, height = 200, unit = 'mm', dpi = 400)
 
 
 ################################################################################
@@ -307,8 +317,8 @@ dat1 = df_av[df_av$scenario != 'REF',]
 dat2 = df_vsl[df_vsl$scenario != 'REF',]
 
 datt = merge(dat1, dat2) %>%
-  dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
-  dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
+  # dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
+  # dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
   dplyr::rename('alpha_original' = 'alpha') %>%
   dplyr::mutate(alpha_original = factor(alpha_original, levels = c("hi", "med", "lo")))
 datt = pivot_longer(datt, cols = c('vsl_damage_avoided','hcl_damage_avoided','dong_damage_avoided','dech_damage_avoided'), names_to ='method',
@@ -328,6 +338,7 @@ datt$alpha[datt$method %in% c('hcl_damage_avoided') & datt$alpha_original == 'hi
 datt = datt %>%
   dplyr::mutate(alpha = factor(alpha, levels = c("hi", "med", "lo")))
 
+
 ### === extended figure
 ## -- prob distrib & cumulative functions
 dpd = prob_distrib_econ(datt %>% filter(cb_group == '<1000'),2030,remove_xfacet = FALSE,reg = 'WORLD',legend = FALSE)
@@ -340,8 +351,8 @@ dat11 = dat1 %>%
 dat11 = pivot_wider(dat11, names_from = scenario, values_from = dong_damage_avoided) %>%
   drop_na() %>%
   dplyr::group_by(region, year, alpha, cb_group, n, model) %>%
-  dplyr::summarise(EoC_median = median(EoC),
-                NZ_median = median(NZ)) %>%
+  dplyr::summarise(EoC_median = -median(EoC),
+                   NZ_median = -median(NZ)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(region, year, alpha, cb_group, n) %>%
   dplyr::summarise(EoC_median = median(EoC_median),
@@ -372,8 +383,8 @@ dat21 = dat2 %>%
 dat21 = pivot_wider(dat21, names_from = scenario, values_from = vsl_damage_avoided) %>%
   drop_na() %>%
   dplyr::group_by(region, year, alpha, cb_group, n) %>%
-  dplyr::summarise(EoC_median = median(EoC),
-                   NZ_median = median(NZ)) %>%
+  dplyr::summarise(EoC_median = -median(EoC),
+                   NZ_median = -median(NZ)) %>%
   dplyr::ungroup() %>%
   dplyr::group_by(region, year, alpha, cb_group, n) %>%
   dplyr::summarise(EoC_median = median(EoC_median),
@@ -411,12 +422,12 @@ dattm = pivot_longer(dattm, cols = c('vsl_damage_avoided','dong_damage_avoided',
                      values_to = 'value')
 
 # Consider only median discount rate and 2030
-dattm = dattm |> filter(alpha == 'med')
+dattm = dattm |> filter(alpha == 'med', n != 'WORLD')
 y = 2030
 
 pl_map = map_plot(dattm,save = FALSE,'av_damage_diff',y,facet_title = TRUE)
 name = paste0('paper_figures/fig3/map_av_damage_diff_',paste(y, collapse = '-'),'.png')
-ggsave(file=file.path(name), width = 550, height = 175, units = 'mm', plot = pl_map)
+ggsave(file=file.path(name), width = 550, height = 175, units = 'mm', dpi = 400, plot = pl_map)
 
 
 ## -- ks test
@@ -435,28 +446,31 @@ pl_ks = pl_ks +
 
 ## -- whole figure
 # without title
-pl = ggdraw() +
-  draw_plot(pl_map, x = 0.01, y = 0.65, width = 0.9, height = 0.40) +
-  draw_plot(dpd, x = 0.01, y = 0.38, width = 0.9, height = 0.34) +
+p1 = ggdraw() +
+  draw_plot(pl_map, x = 0.01, y = 0.63, width = 0.9, height = 0.40) +
+  draw_plot(dpd, x = 0.01, y = 0.37, width = 0.9, height = 0.34) +
   draw_plot(cpd, x = 0.01, y = 0, width = 0.9, height = 0.39) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0), y = c(0.99, 0.72, 0.39))
-ggsave(file=file.path(paste0('paper_figures/fig3/extendend_econ_cobenefits_notitle_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 350, height = 250, unit = 'mm')
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
+                  x = c(0, 0, 0), y = c(0.95, 0.72, 0.39)) +
+  draw_plot_label(label = c(""), size = 20,
+                  x = -0.330, y = 1) +
+  theme(plot.background = element_rect(fill = 'white', color = 'white'))
+ggsave(file=file.path(paste0('paper_figures/fig3/extended_econ_cobenefits_notitle_',paste(y, collapse = '-'),'.png')), plot = p1, width = 350, height = 250, unit = 'mm', dpi = 400)
 
 # with title
 p1 = ggdraw() +
   draw_plot(pl_map, x = 0.01, y = 0.63, width = 0.9, height = 0.40) +
-  draw_plot(dpd, x = 0.01, y = 0.38, width = 0.9, height = 0.34) +
+  draw_plot(dpd, x = 0.01, y = 0.37, width = 0.9, height = 0.34) +
   draw_plot(cpd, x = 0.01, y = 0, width = 0.9, height = 0.39) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
                   x = c(0, 0, 0), y = c(0.95, 0.72, 0.39)) +
   draw_plot_label(label = c("Extended Figure: Global economic co-benefits of reduced overshoot"), size = 20,
                   x = -0.330, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig3/extended_econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = p1, width = 350, height = 275, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig3/extended_econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = p1, width = 350, height = 275, unit = 'mm', dpi = 400)
 
 # K-S figure for SI
 dir.create(file.path('paper_figures/SI/ks'), showWarnings = FALSE)
-ggsave(file=file.path(paste0('paper_figures/SI/ks/ks_econ_2030_2050.pdf')), plot = pl_ks, width = 400, height = 225, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/SI/ks/ks_econ_2030_2050.pdf')), plot = pl_ks, width = 400, height = 225, unit = 'mm', dpi = 400)
 
 
 ### === main figure
@@ -495,7 +509,7 @@ dattdiff = datt %>%
 econ_pl_main = map_plot(dattdiff %>%
                        filter(cb_group == '<1000', year == 2030),save = FALSE,'av_damage_diff_main',y) +
   theme(strip.text = element_text(face = "bold", size = 12))
-ggsave(file=paste0('paper_figures/fig3/map_av_damage_diff_main_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', plot = econ_pl_main)
+ggsave(file=paste0('paper_figures/fig3/map_av_damage_diff_main_',paste(y, collapse = '-'),'.pdf'), width = 300, height = 100, units = 'mm', dpi = 400, plot = econ_pl_main)
 
 
 # without title
@@ -504,15 +518,18 @@ legend = ggpubr::get_legend(cpd_main +
                               theme(legend.direction = 'vertical'))
 
 pl = ggdraw() +
-  draw_plot(econ_pl_main, x = 0.01, y = 0.46, width = 0.95, height = 0.6) +
+  draw_plot(econ_pl_main, x = 0.01, y = 0.42, width = 0.95, height = 0.6) +
   draw_plot(dpd_main + 
-              theme(legend.position = 'none'), x = 0.02, y = 0.11, width = 0.35, height = 0.4) +
+              theme(legend.position = 'none'), x = 0.02, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cpd_main + 
-              theme(legend.position = 'none'), x = 0.62, y = 0.11, width = 0.35, height = 0.4) +
-  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.15, width = 1, height = 1) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
-                  x = c(0, 0, 0.6), y = c(0.98, 0.53, 0.53))
-ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_notitle_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
+              theme(legend.position = 'none'), x = 0.62, y = 0.07, width = 0.35, height = 0.4) +
+  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
+                  x = c(0, 0, 0.6), y = c(0.94, 0.5, 0.5)) +
+  draw_plot_label(label = c(""), size = 19,
+                  x = -0.203, y = 1) +
+  theme(plot.background = element_rect(fill = 'white', color = 'white'))
+ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_notitle_',paste(y, collapse = '-'),'.png')), plot = pl, width = 400, height = 200, unit = 'mm', dpi = 400)
 
 
 # with title
@@ -523,11 +540,11 @@ pl = ggdraw() +
   draw_plot(cpd_main + 
               theme(legend.position = 'none'), x = 0.62, y = 0.07, width = 0.35, height = 0.4) +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.225, y = -0.19, width = 1, height = 1) +
-  draw_plot_label(label = c("a", "b", "c"), size = 15,
+  draw_plot_label(label = c("A", "B", "C"), size = 15,
                   x = c(0, 0, 0.6), y = c(0.94, 0.5, 0.5)) +
   draw_plot_label(label = c("Global economic co-benefits of reduced overshoot"), size = 19,
                   x = -0.203, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_',paste(y, collapse = '-'),'.pdf')), plot = pl, width = 400, height = 200, unit = 'mm', dpi = 400)
 
 ################################################################################
 #                          FIG 4: ECONOMY UNCERTAINTY                          #
@@ -535,8 +552,8 @@ ggsave(file=file.path(paste0('paper_figures/fig3/econ_cobenefits_',paste(y, coll
 dir.create(file.path('paper_figures/fig4'), showWarnings = FALSE)
 
 datt = merge(df_av, df_vsl) %>%
-  dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
-  dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
+  # dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
+  # dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
   dplyr::rename('alpha_original' = 'alpha') %>%
   dplyr::mutate(alpha_original = factor(alpha_original, levels = c("hi", "med", "lo")))
 datt = pivot_longer(datt, cols = c('vsl_damage_avoided','hcl_damage_avoided','dong_damage_avoided','dech_damage_avoided'), names_to ='method',
@@ -611,44 +628,23 @@ legend = ggpubr::get_legend(pl_sens_india +
 # without title
 pl = ggdraw() +
   draw_plot(pl_sens_india +
-              theme(legend.position = 'none'), x = 0.01, y = 0.55, width = 0.3, height = 0.45) +
+              theme(legend.position = 'none'), x = 0.01, y = 0.56, width = 0.3, height = 0.44) +
   draw_plot(pl_sens_europe +
-              theme(legend.position = 'none'), x = 0.01, y = 0.1, width = 0.3, height = 0.45) +
+              theme(legend.position = 'none'), x = 0.01, y = 0.11, width = 0.3, height = 0.44) +
   draw_plot(pl_sens_latinam +
               theme(legend.position = 'none') +
-              labs(y = ''), x = 0.33, y = 0.55, width = 0.3, height = 0.45) +
+              labs(y = ''), x = 0.33, y = 0.56, width = 0.3, height = 0.44) +
   draw_plot(pl_sens_northam +
               theme(legend.position = 'none') +
-              labs(y = ''), x = 0.33, y = 0.1, width = 0.3, height = 0.45) +
-  draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.1, y = -0.44, width = 1, height = 1) +
-  draw_plot(pl_iams + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none'),
-            x = 0.66, y = 0.53, width = 0.34, height = 0.465) +
-  draw_plot(pl_meth + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none'),
-            x = 0.66, y = 0.05, width = 0.305, height = 0.465) +
-  draw_plot_label(label = c("a1 (India)", "a2 (Europe)", "a3 (North Am)", "a4 (Latin Am)", "b1", "b2"), size = 15,
-                  x = c(-0.01, 0.305, -0.025, 0.3, 0.65, 0.65), y = c(0.98, 0.98, 0.53, 0.53, 0.98, 0.53))
-ggsave(file=file.path(paste0('paper_figures/fig4/econ_uncertainty_notitle_2030.pdf')), plot = pl, width = 500, height = 250, unit = 'mm')
-
-# with title
-pl = ggdraw() +
-  draw_plot(pl_sens_india +
-            theme(legend.position = 'none'), x = 0.01, y = 0.53, width = 0.3, height = 0.44) +
-  draw_plot(pl_sens_europe +
-              theme(legend.position = 'none'), x = 0.01, y = 0.08, width = 0.3, height = 0.44) +
-  draw_plot(pl_sens_latinam +
-              theme(legend.position = 'none') +
-              labs(y = ''), x = 0.33, y = 0.53, width = 0.3, height = 0.44) +
-  draw_plot(pl_sens_northam +
-              theme(legend.position = 'none') +
-              labs(y = ''), x = 0.33, y = 0.08, width = 0.3, height = 0.44) +
+              labs(y = ''), x = 0.33, y = 0.11, width = 0.3, height = 0.44) +
   draw_plot(cowplot::plot_grid(legend,blank_p,nrow=1), x = 0.1, y = -0.45, width = 1, height = 1) +
   draw_plot(pl_iams + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none'),
-            x = 0.66, y = 0.52, width = 0.34, height = 0.46) +
+            x = 0.66, y = 0.55, width = 0.34, height = 0.46) +
   draw_plot(pl_meth + labs(title = '') + theme(strip.text.x = element_blank(), legend.position = 'none'),
-            x = 0.66, y = 0.065, width = 0.305, height = 0.46) +
-  draw_plot_label(label = c("a1 (India)", "a2 (Europe)", "a3 (North Am)", "a4 (Latin Am)", "b1", "b2"), size = 15,
-                  x = c(-0.0105, 0.305, -0.025, 0.3, 0.65, 0.65), y = c(0.96, 0.96, 0.51, 0.51, 0.96, 0.51)) +
-  draw_plot_label(label = c("Economic co-benefits uncertainty"), size = 20,
+            x = 0.66, y = 0.095, width = 0.305, height = 0.46) +
+  draw_plot_label(label = c("A (India)", "B (Latin Am)", "C (Europe)", "D (North Am)", "E", "F"), size = 15,
+                  x = c(-0.0105, 0.305, -0.015, 0.3, 0.65, 0.65), y = c(0.99, 0.99, 0.54, 0.54, 0.99, 0.54)) +
+  draw_plot_label(label = c(""), size = 20,
                   x = -0.113, y = 1)
-ggsave(file=file.path(paste0('paper_figures/fig4/econ_uncertainty_2030.pdf')), plot = pl, width = 500, height = 275, unit = 'mm')
+ggsave(file=file.path(paste0('paper_figures/fig4/econ_uncertainty_notitle_2030.pdf')), plot = pl, width = 500, height = 250, unit = 'mm', dpi = 400)
 

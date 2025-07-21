@@ -15,13 +15,13 @@ do_iams_vs_impfun_pre = function(datIni, poll) {
   datall = do_rename_imp_fun_etal(datall)
   if (poll == 'PM25') {
     datall$imp_fun_label = (factor(datall$imp_fun_label, levels = 
-                                            c('Cohen et al. (2005)','Krewski et al. (2009)',
-                                              'Burnett et al. (2014)','GBD (low) (2015)','GBD (medium) (2015)',
-                                              'GBD (high) (2015)','Burnett et al.\n(with) (2018)',
-                                              'Burnett et al.\n(without) (2018)')))
+                                            c('Cohen et al. (2005) [51]','Krewski et al. (2009) [55]',
+                                              'Burnett et al. (2014) [50]','GBD (low) (2015) [56]','GBD (medium) (2015) [56]',
+                                              'GBD (high) (2015) [56]','Burnett et al.\n(with) (2018) [49]',
+                                              'Burnett et al.\n(without) (2018) [49]')))
   } else {
     datall$imp_fun_label = (factor(datall$imp_fun_label, levels = 
-                                            c('Jerrett et al. (2009)','GBD (2015)')))
+                                            c('Jerrett et al. (2009) [41]','GBD (2015) [56]')))
   }
   datall$cb_group <- factor(datall$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))
 

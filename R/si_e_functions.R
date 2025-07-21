@@ -119,7 +119,7 @@ doE_ks_test_plot = function(dat) {
   }
   
   name_file_E = paste("Results/Emiss/KS_test",paste('ks_test','pdf',sep='.'),sep='/')
-  ggsave(file=name_file_E, width = 300, height = 180, units = "mm",plot = pl_E, limitsize = FALSE)
+  ggsave(file=name_file_E, width = 250, height = 180, units = "mm",plot = pl_E, limitsize = FALSE)
   
   # K-S figure for SI
   dir.create(file.path('paper_figures/SI/ks'), showWarnings = FALSE)

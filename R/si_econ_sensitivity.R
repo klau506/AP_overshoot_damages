@@ -26,23 +26,19 @@ doEcon_elast_ci_sens_plot_by_reg = function(datIni,reg,poll,xx,yy) {
   dat = do_rename_meth_etal(dat)
   dat$meth_label = fct_rev(dat$meth_label)
   
-  dat[impact_function_group == "BRUNETT2018_gWITH", imp_fun_label := "Brunett et al.\n(with) (2018)"]
-  dat[impact_function_group == "BRUNETT2018_gOUT", imp_fun_label := "Brunett et al.\n(without) (2018)"]
-  dat[impact_function_group == "BURNETT2014_gUNI", imp_fun_label := "Burnett et al. (2014)"]
-  dat[impact_function_group == "GBD2016_gLO", imp_fun_label := "GBD (low) (2016)"]
-  dat[impact_function_group == "GBD2016_gMED", imp_fun_label := "GBD (medium) (2016)"]
-  dat[impact_function_group == "GBD2016_gHI", imp_fun_label := "GBD (high) (2016)"]
-  dat[impact_function_group == "KREWSKI2009_gUNI", imp_fun_label := "Krewski et al. (2009)"]
-  dat[impact_function_group == "OSTRO2004_gUNI", imp_fun_label := "Cohen et al. (2005)"]
+  dat[impact_function_group == "BRUNETT2018_gWITH", imp_fun_label := "Brunett et al.\n(with) (2018) [49]"]
+  dat[impact_function_group == "BRUNETT2018_gOUT", imp_fun_label := "Brunett et al.\n(without) (2018) [49]"]
+  dat[impact_function_group == "BURNETT2014_gUNI", imp_fun_label := "Burnett et al. (2014) [50]"]
+  dat[impact_function_group == "GBD2016_gLO", imp_fun_label := "GBD (low) (2016) [56]"]
+  dat[impact_function_group == "GBD2016_gMED", imp_fun_label := "GBD (medium) (2016) [56]"]
+  dat[impact_function_group == "GBD2016_gHI", imp_fun_label := "GBD (high) (2016) [56]"]
   dat[impact_function_group == "Zero rr fun used", imp_fun_label := "No RR function\nused"]
-  dat[, impact_function_group := factor(imp_fun_label, levels = c("Brunett et al.\n(with) (2018)",
-                                                                  "Brunett et al.\n(without) (2018)",
-                                                                  "Burnett et al. (2014)",
-                                                                  "GBD (low) (2016)",
-                                                                  "GBD (medium) (2016)",
-                                                                  "GBD (high) (2016)",
-                                                                  "Krewski et al. (2009)",
-                                                                  "Cohen et al. (2005)",
+  dat[, impact_function_group := factor(imp_fun_label, levels = c("Brunett et al.\n(with) (2018) [49]",
+                                                                  "Brunett et al.\n(without) (2018) [49]",
+                                                                  "Burnett et al. (2014) [50]",
+                                                                  "GBD (low) (2016) [56]",
+                                                                  "GBD (medium) (2016) [56]",
+                                                                  "GBD (high) (2016) [56]",
                                                                   "No RR function\nused"
   ))]
   

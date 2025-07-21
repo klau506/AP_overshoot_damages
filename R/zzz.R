@@ -2,6 +2,7 @@ shortpal.scen = c('EoC'='#EF2424',
                   'NZ'='#2465EF')
 regions.colors = c('#c2b280','#29AB87','#FF7F50','#FFD700','#228B22','#4682B4','#191970',
                    '#8FBC8F','#000000','#800000','#87CEEB')
+set1 = c( "#BFD7EA", "#FF6663", "#E0FF4F", "#EBC0CA", "#63FF9A", "#4FA4FF", "#A65628")
 longpal_impfun_colors = c('EoC.hi'='#040445',
                           'NZ.hi'='#128043',
                           'EoC.med'='#000080',
@@ -15,9 +16,9 @@ longpal_impfun_colors_th = c('EoC.95th'='#040445',
                          'EoC.5th'='#7676C8',#F38858,FF9200
                          'NZ.5th'='#77F7B0')#3ED8D7,0BD5CB
 
-longlabs.impfunCI = c('EoC.95th' = 'Eoc, 95% CI','NZ.95th' = 'NZ, 95% CI',
-                      'EoC.50th' = 'EoC, 50% CI','NZ.50th' = 'NZ, 50% CI',
-                      'EoC.5th' = 'EoC, 5% CI','NZ.5th' = 'NZ, 5% CI')
+longlabs.impfunCI = c('EoC.95th' = 'Eoc, 97.5th','NZ.95th' = 'NZ, 97.5th',
+                      'EoC.50th' = 'EoC, 50th','NZ.50th' = 'NZ, 50th',
+                      'EoC.5th' = 'EoC, 2.5th','NZ.5th' = 'NZ, 2.5th')
 breaks.impfunCI = c('EoC.95th','NZ.95th','EoC.50th','NZ.50th','EoC.5th','NZ.5th')
 
 longpal_linetype = c('EoC.hi'='dashed',
@@ -38,11 +39,11 @@ longlabs.alphaCI = c(expression('EoC, high elasticity'),expression('NZ, high ela
 # longlabs.alphaCI = c(expression('EoC,' ~ alpha ~ 'high'),expression('NZ, ' ~ alpha ~ 'high'),
 #                      expression('EoC,' ~ alpha ~ 'medium'),expression('NZ, ' ~ alpha ~ 'medium'),
 #                      expression('EoC,' ~ alpha ~ 'low'),expression('NZ, ' ~ alpha ~ 'low'))
-shortpal_linetype = c('5th %CI'='dotted',
-                      '50th %CI'='solid',
-                      '95th %CI'='44',
+shortpal_linetype = c('2.5th'='dotted',
+                      '50th'='solid',
+                      '97.5th'='44',
                       'No ZCF\nuncertainty'='3313')
-shortpal_linetype.labs = c('5th %CI','50th %CI','95th %CI','No ZCF\nuncertainty')
+shortpal_linetype.labs = c('2.5th','50th','97.th','No ZCF\nuncertainty')
                       
 alpha.linetype = c('hi'='dashed',
                    'med'='solid',
@@ -51,7 +52,7 @@ alpha.linetype = c('hi'='dashed',
 alpha.labs = c('high','medium','low')
 names(alpha.labs) <- c("hi", "med", "lo")
 
-quantile.labs = c('5th %CI','50th %CI','95th %CI')
+quantile.labs = c('2.5th','50th','97.5th')
 names(quantile.labs) <- c("v05", "vmed", "v95")
 
 scen.colors = c('EoC'='#C3423F',
@@ -61,24 +62,32 @@ scenario.colors = c('EoC'='navy',
                     'NZ'='seagreen3')
 scenario.labs = c('EoC','NZ')
 
-method_av.labs <- c("Dong et al. \n (2021)", "Dechezlepretre \n et al. (2019)", "VSL \n", 'HCL\n')
+method_av.labs <- c("Dong et al. \n (2021) [60]", "Dechezlepretre \n et al. (2019) [59]", "VSL \n", 'HCL\n')
 names(method_av.labs) <- c("dong_damage_avoided", "dech_damage_avoided", "vsl_damage_avoided", 'hcl_damage_avoided')
 
-impact_function_group.labs <- c("GBD (high) (2015)", "GBD (low) (2015)", "GBD (medium) (2015)",
-                                "GBD (2015)", "Jerrett et al. (2009)", "Burnett et al. (2014)",
-                                "Krewski et al. (2009)", "Cohen et al. (2005)", "Burnett et al.\n(without) (2018)",
-                                "Burnett et al.\n(with) (2018)")
+impact_function_group.labs <- c("GBD (high) (2015) [56]", "GBD (low) (2015) [56]", "GBD (medium) (2015) [56]",
+                                "GBD (2015) [56]", "Jerrett et al. (2009) [41]", "Burnett et al. (2014) [50]",
+                                "Burnett et al.\n(without) (2018) [49]",
+                                "Burnett et al.\n(with) (2018) [49]")
 names(impact_function_group.labs) <- c("PM25MORT_GBD2016_HI", "PM25MORT_GBD2016_LO", "PM25MORT_GBD2016_MED",
                                        "O3MORT_GBD2015_UNI", "O3MORT_JERRET2009_UNI", "PM25MORT_BURNETT2014_UNI",
-                                       "PM25MORT_KREWSKI2009_UNI", "PM25MORT_OSTRO2004_UNI", "PM25MORT_BRUNETT2018_OUT",
+                                       "PM25MORT_BRUNETT2018_OUT",
                                        "PM25MORT_BRUNETT2018_WITH")
-impact_function_group_2lines.labs <- c("GBD(high)\n(2015)", "GBD(low)\n(2015)", "GBD(medium)\n(2015)",
-                                "GBD(2015)", "Jerrett et\nal. (2009)", "Burnett et\nal. (2014)",
-                                "Krewski et\nal. (2009)", "Cohen et\nal. (2005)", "Burnett et al.\n(out)(2018)",
-                                "Burnett et al.\n(with)(2018)")
+impact_function_group_2lines.labs <- c("GBD(high)\n(2015) [56]", "GBD(low)\n(2015) [56]", "GBD(medium)\n(2015) [56]",
+                                "GBD(2015) [56]", "Jerrett et\nal. (2009) [41]", "Burnett et\nal. (2014) [50]",
+                                "Burnett et al.\n(out)(2018) [49]",
+                                "Burnett et al.\n(with)(2018) [49]")
 names(impact_function_group_2lines.labs) <- c("PM25MORT_GBD2016_HI", "PM25MORT_GBD2016_LO", "PM25MORT_GBD2016_MED",
                                        "O3MORT_GBD2015_UNI", "O3MORT_JERRET2009_UNI", "PM25MORT_BURNETT2014_UNI",
-                                       "PM25MORT_KREWSKI2009_UNI", "PM25MORT_OSTRO2004_UNI", "PM25MORT_BRUNETT2018_OUT",
+                                       "PM25MORT_BRUNETT2018_OUT",
+                                       "PM25MORT_BRUNETT2018_WITH")
+impact_function_group_2lines.nospace.labs <- c("GBD(high)\n(2015) [56]", "GBD(low)\n(2015) [56]", "GBD(medium)\n(2015) [56]",
+                                "GBD(2015)\n[56]", "Jerrett et al.\n(2009) [41]", "Burnett et\nal. (2014) [50]",
+                                "Burnett et al.\n(out)(2018)[49]",
+                                "Burnett et al.\n(with)(2018)[49]")
+names(impact_function_group_2lines.nospace.labs) <- c("PM25MORT_GBD2016_HI", "PM25MORT_GBD2016_LO", "PM25MORT_GBD2016_MED",
+                                       "O3MORT_GBD2015_UNI", "O3MORT_JERRET2009_UNI", "PM25MORT_BURNETT2014_UNI",
+                                       "PM25MORT_BRUNETT2018_OUT",
                                        "PM25MORT_BRUNETT2018_WITH")
 quantile.labs = c('5th','Median','95th')
 names(quantile.labs) <- c("v05", "vmed", "v95")
@@ -86,7 +95,7 @@ quantile.linestyle = c('v05'='dotted',
                        'vmed'='solid',
                        'v95'='dashed')
 
-ci_z_level.labs = c('5th','50th','95th')
+ci_z_level.labs = c('2.5th','50th','97.5th')
 # ci_z_level.labs = c('5th param\n95th CF','50th param\n50th CF','95th param\n5th CF')
 names(ci_z_level.labs) <- c('5th','50th','95th')
 ci_z_level.linestyle = c('5th'='dotted',
@@ -106,35 +115,31 @@ regions.colors = c('#FFFF00','#FF4500','#8A2BE2','#1E90FF','#32CD32','#FFA500','
 do_rename_imp_fun_etal = function(dat, type = FALSE) {
   dat = data.table(dat)
   if (!type) {
-    dat[impact_function_group %in% c("PM25MORT_OSTRO2004_UNI","OSTRO2004_gUNI"),       imp_fun_label := 'Cohen et al. (2005)']
-    dat[impact_function_group %in% c("PM25MORT_KREWSKI2009_UNI","KREWSKI2009_gUNI"),   imp_fun_label := 'Krewski et al. (2009)']
-    dat[impact_function_group %in% c("PM25MORT_BURNETT2014_UNI","BURNETT2014_gUNI"),   imp_fun_label := 'Burnett et al. (2014)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_LO","GBD2016_gLO"),             imp_fun_label := 'GBD (low) (2015)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_MED","GBD2016_gMED"),           imp_fun_label := 'GBD (medium) (2015)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_HI","GBD2016_gHI"),             imp_fun_label := 'GBD (high) (2015)']
-    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_WITH","BRUNETT2018_gWITH"), imp_fun_label := 'Burnett et al.\n(with) (2018)']
-    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_OUT","BRUNETT2018_gOUT"),   imp_fun_label := 'Burnett et al.\n(without) (2018)']
-    dat[impact_function_group %in% c("O3MORT_GBD2015_UNI","GBD2015_gUNI"),             imp_fun_label := 'GBD (2015)']
-    dat[impact_function_group %in% c("O3MORT_JERRET2009_UNI","JERRET2009_gUNI"),       imp_fun_label := 'Jerrett et al. (2009)']
+    dat[impact_function_group %in% c("PM25MORT_BURNETT2014_UNI","BURNETT2014_gUNI"),   imp_fun_label := 'Burnett et al. (2014) [50]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_LO","GBD2016_gLO"),             imp_fun_label := 'GBD (low) (2015) [56]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_MED","GBD2016_gMED"),           imp_fun_label := 'GBD (medium) (2015) [56]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_HI","GBD2016_gHI"),             imp_fun_label := 'GBD (high) (2015) [56]']
+    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_WITH","BRUNETT2018_gWITH"), imp_fun_label := 'Burnett et al.\n(with) (2018) [49]']
+    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_OUT","BRUNETT2018_gOUT"),   imp_fun_label := 'Burnett et al.\n(without) (2018) [49]']
+    dat[impact_function_group %in% c("O3MORT_GBD2015_UNI","GBD2015_gUNI"),             imp_fun_label := 'GBD (2015) [56]']
+    dat[impact_function_group %in% c("O3MORT_JERRET2009_UNI","JERRET2009_gUNI"),       imp_fun_label := 'Jerrett et al. (2009) [41]']
   } else {
-    dat[impact_function_group %in% c("PM25MORT_OSTRO2004_UNI","OSTRO2004_gUNI"),       imp_fun_label := 'Cohen et al. (2005)\n(Rational)']
-    dat[impact_function_group %in% c("PM25MORT_KREWSKI2009_UNI","KREWSKI2009_gUNI"),   imp_fun_label := 'Krewski et al. (2009)\n(LL)']
-    dat[impact_function_group %in% c("PM25MORT_BURNETT2014_UNI","BURNETT2014_gUNI"),   imp_fun_label := 'Burnett et al. (2014)\n(IER)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_LO","GBD2016_gLO"),             imp_fun_label := 'GBD (low) (2015)\n(IER)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_MED","GBD2016_gMED"),           imp_fun_label := 'GBD (medium) (2015)\n(IER)']
-    dat[impact_function_group %in% c("PM25MORT_GBD2016_HI","GBD2016_gHI"),             imp_fun_label := 'GBD (high) (2015)\n(IER)']
-    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_WITH","BRUNETT2018_gWITH"), imp_fun_label := 'Burnett et al.\n(with) (2018)\n(GEMM)']
-    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_OUT","BRUNETT2018_gOUT"),   imp_fun_label := 'Burnett et al.\n(without) (2018)\n(GEMM)']
-    dat[impact_function_group %in% c("O3MORT_GBD2015_UNI","GBD2015_gUNI"),             imp_fun_label := 'GBD (2015)\n(LL)']
-    dat[impact_function_group %in% c("O3MORT_JERRET2009_UNI","JERRET2009_gUNI"),       imp_fun_label := 'Jerrett et al. (2009)\n(LL)']
+    dat[impact_function_group %in% c("PM25MORT_BURNETT2014_UNI","BURNETT2014_gUNI"),   imp_fun_label := 'Burnett et al. (2014)\n(IER) [50]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_LO","GBD2016_gLO"),             imp_fun_label := 'GBD (low) (2015)\n(IER) [56]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_MED","GBD2016_gMED"),           imp_fun_label := 'GBD (medium) (2015)\n(IER) [56]']
+    dat[impact_function_group %in% c("PM25MORT_GBD2016_HI","GBD2016_gHI"),             imp_fun_label := 'GBD (high) (2015)\n(IER) [56]']
+    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_WITH","BRUNETT2018_gWITH"), imp_fun_label := 'Burnett et al.\n(with) (2018)\n(GEMM) [49]']
+    dat[impact_function_group %in% c("PM25MORT_BRUNETT2018_OUT","BRUNETT2018_gOUT"),   imp_fun_label := 'Burnett et al.\n(without) (2018)\n(GEMM) [49]']
+    dat[impact_function_group %in% c("O3MORT_GBD2015_UNI","GBD2015_gUNI"),             imp_fun_label := 'GBD (2015)\n(LL) [56]']
+    dat[impact_function_group %in% c("O3MORT_JERRET2009_UNI","JERRET2009_gUNI"),       imp_fun_label := 'Jerrett et al. (2009)\n(LL) [41]']
   }
   return(dat)
 }
 
 do_rename_meth_etal = function(dat) {
   dat = data.table(dat)
-  dat[method %in% c("dong_damage_avoided"),  meth_label := 'Dong et al.\n(2021)']
-  dat[method %in% c("dech_damage_avoided"),  meth_label := 'Dechezlepretre\net al. (2019)']
+  dat[method %in% c("dong_damage_avoided"),  meth_label := 'Dong et al.\n(2021) [60]']
+  dat[method %in% c("dech_damage_avoided"),  meth_label := 'Dechezlepretre\net al. (2019) [59]']
   dat[method %in% c("vsl_damage_avoided"),   meth_label := 'VSL']
   dat[method %in% c("hcl_damage_avoided"),   meth_label := 'HCL']
   return(dat)
@@ -219,8 +224,6 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
   dat = data.table(dat)
   
   if (poll_names & !short_names) {
-    dat[impact_function_group == "PM25MORT_OSTRO2004_UNI", imp_fun_label := 'PM25 OSTRO2004']
-    dat[impact_function_group == "PM25MORT_KREWSKI2009_UNI", imp_fun_label := 'PM25 KREWSKI2009']
     dat[impact_function_group == "PM25MORT_BURNETT2014_UNI", imp_fun_label := 'PM25 BURNETT2014']
     dat[impact_function_group == "PM25MORT_GBD2016_LO", imp_fun_label := 'PM25 GBD2016 LOW']
     dat[impact_function_group == "PM25MORT_GBD2016_MED", imp_fun_label := 'PM25 GBD2016 MEDIUM']
@@ -229,9 +232,7 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
     dat[impact_function_group == "PM25MORT_BRUNETT2018_OUT", imp_fun_label := 'PM25 BRUNETT2018 WITHOUT']
     dat[impact_function_group == "O3MORT_GBD2015_UNI", imp_fun_label := 'O3 GBD2015']
     dat[impact_function_group == "O3MORT_JERRET2009_UNI", imp_fun_label := 'O3 JERRET2009']
-    dat[, impact_function_group := factor(imp_fun_label, levels = c('PM25 OSTRO2004',
-                                                                    'PM25 KREWSKI2009',
-                                                                    'PM25 BURNETT2014',
+    dat[, impact_function_group := factor(imp_fun_label, levels = c('PM25 BURNETT2014',
                                                                     'PM25 GBD2016 LOW',
                                                                     'PM25 GBD2016 MEDIUM',
                                                                     'PM25 GBD2016 HIGH',
@@ -240,8 +241,6 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
                                                                     'O3 JERRET2009',
                                                                     'O3 GBD2015'))]
   } else if (!poll_names & !short_names) {
-    dat[impact_function_group == "PM25MORT_OSTRO2004_UNI", imp_fun_label := 'OSTRO2004']
-    dat[impact_function_group == "PM25MORT_KREWSKI2009_UNI", imp_fun_label := 'KREWSKI2009']
     dat[impact_function_group == "PM25MORT_BURNETT2014_UNI", imp_fun_label := 'BURNETT2014']
     dat[impact_function_group == "PM25MORT_GBD2016_LO", imp_fun_label := 'GBD2016 LOW']
     dat[impact_function_group == "PM25MORT_GBD2016_MED", imp_fun_label := 'GBD2016 MEDIUM']
@@ -250,9 +249,7 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
     dat[impact_function_group == "PM25MORT_BRUNETT2018_OUT", imp_fun_label := 'BRUNETT2018 WITHOUT']
     dat[impact_function_group == "O3MORT_GBD2015_UNI", imp_fun_label := 'GBD2015']
     dat[impact_function_group == "O3MORT_JERRET2009_UNI", imp_fun_label := 'JERRET2009']
-    dat[, impact_function_group := factor(imp_fun_label, levels = c('OSTRO2004',
-                                                                    'KREWSKI2009',
-                                                                    'BURNETT2014',
+    dat[, impact_function_group := factor(imp_fun_label, levels = c('BURNETT2014',
                                                                     'GBD2016 LOW',
                                                                     'GBD2016 MEDIUM',
                                                                     'GBD2016 HIGH',
@@ -261,8 +258,6 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
                                                                     'JERRET2009',
                                                                     'GBD2015'))]
   } else if (!poll_names & short_names) {
-    dat[impact_function_group == "PM25MORT_OSTRO2004_UNI", imp_fun_label := 'OSTRO2004']
-    dat[impact_function_group == "PM25MORT_KREWSKI2009_UNI", imp_fun_label := 'KREWSKI2009']
     dat[impact_function_group == "PM25MORT_BURNETT2014_UNI", imp_fun_label := 'BURNETT2014']
     dat[impact_function_group == "PM25MORT_GBD2016_LO", imp_fun_label := 'GBD2016 LOW']
     dat[impact_function_group == "PM25MORT_GBD2016_MED", imp_fun_label := 'GBD2016 MED']
@@ -271,9 +266,7 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
     dat[impact_function_group == "PM25MORT_BRUNETT2018_OUT", imp_fun_label := 'BRUNETT18 O']
     dat[impact_function_group == "O3MORT_GBD2015_UNI", imp_fun_label := 'GBD2015']
     dat[impact_function_group == "O3MORT_JERRET2009_UNI", imp_fun_label := 'JERRET2009']
-    dat[, impact_function_group := factor(imp_fun_label, levels = c('OSTRO2004',
-                                                                    'KREWSKI2009',
-                                                                    'BURNETT2014',
+    dat[, impact_function_group := factor(imp_fun_label, levels = c('BURNETT2014',
                                                                     'GBD2016 LOW',
                                                                     'GBD2016 MED',
                                                                     'GBD2016 HIGH',
@@ -282,8 +275,6 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
                                                                     'JERRET2009',
                                                                     'GBD2015'))]
   } else {
-    dat[impact_function_group == "PM25MORT_OSTRO2004_UNI", imp_fun_label := 'PM25 OSTRO2004']
-    dat[impact_function_group == "PM25MORT_KREWSKI2009_UNI", imp_fun_label := 'PM25 KREWSKI2009']
     dat[impact_function_group == "PM25MORT_BURNETT2014_UNI", imp_fun_label := 'PM25 BURNETT2014']
     dat[impact_function_group == "PM25MORT_GBD2016_LO", imp_fun_label := 'PM25 GBD2016 LOW']
     dat[impact_function_group == "PM25MORT_GBD2016_MED", imp_fun_label := 'PM25 GBD2016 MED']
@@ -292,9 +283,7 @@ do_rename_imp_fun = function(dat,poll_names,short_names) {
     dat[impact_function_group == "PM25MORT_BRUNETT2018_OUT", imp_fun_label := 'PM25 BRUNETT18 O']
     dat[impact_function_group == "O3MORT_GBD2015_UNI", imp_fun_label := 'O3 GBD2015']
     dat[impact_function_group == "O3MORT_JERRET2009_UNI", imp_fun_label := 'O3 JERRET2009']
-    dat[, impact_function_group := factor(imp_fun_label, levels = c('PM25 OSTRO2004',
-                                                                    'PM25 KREWSKI2009',
-                                                                    'PM25 BURNETT2014',
+    dat[, impact_function_group := factor(imp_fun_label, levels = c('PM25 BURNETT2014',
                                                                     'PM25 GBD2016 LOW',
                                                                     'PM25 GBD2016 MED',
                                                                     'PM25 GBD2016 HIGH',

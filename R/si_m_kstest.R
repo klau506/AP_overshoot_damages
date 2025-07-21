@@ -56,16 +56,16 @@ doM_ks_test_preprocess = function(datIni) {
 
 doM_ks_comp_plot = function(ks_all, SI = FALSE) {
   # reorder rr functions
-  ks_all[, impact_function_group := factor(imp_fun_label, levels = c('Cohen et al. (2005)',
-                                                                     'Krewski et al. (2009)',
-                                                                     'Burnett et al. (2014)',
-                                                                     'GBD (low) (2015)',
-                                                                     'GBD (medium) (2015)',
-                                                                     'GBD (high) (2015)',
-                                                                     'Burnett et al.\n(with) (2018)',
-                                                                     'Burnett et al.\n(without) (2018)',
-                                                                     'Jerrett et al. (2009)',
-                                                                     'GBD (2015)'))]
+  ks_all[, impact_function_group := factor(imp_fun_label, levels = c('Cohen et al. (2005) [51]',
+                                                                     'Krewski et al. (2009) [55]',
+                                                                     'Burnett et al. (2014) [50]',
+                                                                     'GBD (low) (2015) [56]',
+                                                                     'GBD (medium) (2015) [56]',
+                                                                     'GBD (high) (2015) [56]',
+                                                                     'Burnett et al.\n(with) (2018) [49]',
+                                                                     'Burnett et al.\n(without) (2018) [49]',
+                                                                     'Jerrett et al. (2009) [41]',
+                                                                     'GBD (2015) [56]'))]
   ks_all = ks_all %>%
     dplyr::mutate(Regions = sapply(ks_all$Regions, do_rename_regions_string))
   

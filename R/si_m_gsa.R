@@ -5,7 +5,7 @@ doM_gsa_preprocess = function(datIni) {
     dplyr::rename('impact_function' = impact_function_group) %>%
     dplyr::rename('parameter' = ci_level) %>%
     dplyr::rename('cf' = z_level) %>%
-    select(year,policy,carbon_budget,model,cb_group,region,
+    dplyr::select(year,policy,carbon_budget,model,cb_group,region,
            impact_function,parameter,cf,scenario,
            value)
 

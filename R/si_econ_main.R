@@ -3,8 +3,8 @@ df_av = load_df_av()
 df_vsl = load_df_vsl()
 
 datt = merge(df_av, df_vsl) %>%
-  dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
-  dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
+  # dplyr::mutate(vsl_damage_avoided = -vsl_damage_avoided) %>%
+  # dplyr::mutate(dong_damage_avoided = -dong_damage_avoided) %>%
   dplyr::rename('alpha_original' = 'alpha') %>%
   dplyr::mutate(alpha_original = factor(alpha_original, levels = c("hi", "med", "lo"))) %>%
   dplyr::select(-region) %>%

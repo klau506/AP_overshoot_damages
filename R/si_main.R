@@ -1,5 +1,5 @@
 data_path = '../fasstr_data'
-outD = 'econ'
+outD = 'econ3'
 
 library(data.table)
 library(ggplot2)

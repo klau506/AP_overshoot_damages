@@ -68,8 +68,8 @@ doEcon_cumm_plot = function(datIni,reg,yrem) {
   round_num <<- 1
   pl <- ggplot(dat_tmp, aes(value, ecdf, color = interaction(scenario,alpha), fill = interaction(scenario,alpha))) +
     geom_line(linewidth = 1.5) +
-    ggh4x::facet_grid2(cb_group + method ~ year, scales = "free", independent = "all",
-                       labeller = labeller(method = method_av.labs)) +
+    facet_grid(cb_group+method ~ year, scales='free',
+               labeller = labeller(method = method_av.labs)) +
     scale_fill_manual(values = longpal_alpha_colors,
                       name = 'Climate policy design\nand elasticity',
                       labels = longlabs.alphaCI)+

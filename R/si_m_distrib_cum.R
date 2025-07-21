@@ -26,6 +26,14 @@ doM_distrib_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
   
   datall = data.table(datall)
   datall$cb_group <- factor(datall$cb_group, levels = c("<1000", "[1000,2000]", ">2000"))
+  datall$impact_function_group <- factor(datall$impact_function_group, 
+                                         levels = c("PM25MORT_BURNETT2014_UNI",
+                                                    "PM25MORT_GBD2016_LO",
+                                                    "PM25MORT_GBD2016_MED",
+                                                    "PM25MORT_GBD2016_HI",
+                                                    "PM25MORT_BRUNETT2018_OUT",
+                                                    "PM25MORT_BRUNETT2018_WITH"
+                                         ))
   
   pl_title = paste(poll,reg,sep='_')
   
@@ -37,14 +45,14 @@ doM_distrib_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
     geom_vline(data = datall[ci_z_level == '50th'], aes(color = interaction(scen,ci_z_level), xintercept = medi),
                linetype="dashed", linewidth = 1) +
     facet_grid(cb_group+impact_function_group ~ t, scales='free',
-               labeller = labeller(impact_function_group = impact_function_group_2lines.labs))+
+               labeller = labeller(impact_function_group = impact_function_group_2lines.nospace.labs))+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
     scale_x_continuous(labels = function(x) ifelse(x %% 1 == 0, format(x, digits = 1), format(x, digits = 2))) +
     scale_fill_manual(values = longpal_impfun_colors_th,
-                      name = 'Climate policy design\n and 95% CI',
+                      name = 'Climate policy design and percentile ranges for\nparameter-counterfactual value estimates',
                       labels = longlabs.impfunCI) +
     scale_color_manual(values = longpal_impfun_colors_th,
-                       name = 'Climate policy design\n and 95% CI',
+                       name = 'Climate policy design and percentile ranges for\nparameter-counterfactual value estimates',
                        labels = longlabs.impfunCI) +
     labs(title='', x = xxbb, y = "Probability density") +
     theme_pubr() +
@@ -97,12 +105,12 @@ doM_cumm_plot = function(datIni,reg,poll,ylab,cblab,xxbb) {
   pl <- ggplot(dat_kl2, aes(x = value)) +
     geom_line(aes(y = ecdf, color = interaction(scen, ci_z_level)), na.rm = T) +
     facet_grid(cb_group+impact_function_group ~ t, scales='free',
-               labeller = labeller(impact_function_group = impact_function_group_2lines.labs))+
+               labeller = labeller(impact_function_group = impact_function_group_2lines.nospace.labs))+
     scale_fill_manual(values = longpal_impfun_colors_th,
-                      name = 'Climate policy design\n and 95% CI',
+                      name = 'Climate policy design and percentile ranges for\nparameter-counterfactual value estimates',
                       labels = longlabs.impfunCI)+
     scale_color_manual(values = longpal_impfun_colors_th,
-                       name = 'Climate policy design\n and 95% CI',
+                       name = 'Climate policy design and percentile ranges for\nparameter-counterfactual value estimates',
                        labels = longlabs.impfunCI)+
     rotate_y_facet_text(angle = 0, align = 0.5, valign = 0.5) +
     scale_y_continuous(breaks = custom_y_labels) +

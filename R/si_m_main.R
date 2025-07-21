@@ -10,7 +10,7 @@ datMort = datMort%>%
   dplyr::mutate('t' = NULL) %>%
   dplyr::rename('t' = 'year') %>%
   dplyr::mutate('region' = NULL) %>%
-  as.data.table()
+  as.data.table() %>%   dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
 
 datMort_raw = bind_rows(datMort_raw, datMort_w_raw) %>%
   dplyr::rename('Regions' = 'n') %>%
@@ -18,7 +18,8 @@ datMort_raw = bind_rows(datMort_raw, datMort_w_raw) %>%
   dplyr::mutate('t' = NULL) %>%
   dplyr::rename('t' = 'year') %>%
   dplyr::mutate('region' = NULL) %>%
-  as.data.table()
+  as.data.table() %>% 
+  dplyr::filter(!impact_function_group %in% c('PM25MORT_KREWSKI2009_UNI','PM25MORT_OSTRO2004_UNI'))
 
 
 
